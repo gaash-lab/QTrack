@@ -1,0 +1,184 @@
+{
+  "total": 10,
+  "failures": [
+    {
+      "idx": 2,
+      "sample": "<think>no answer here</think>",
+      "error": "No bboxes extracted"
+    },
+    {
+      "idx": 4,
+      "sample": "<answer>   </answer>",
+      "error": "No bboxes extracted"
+    }
+  ],
+  "parse_fail_rate": 0.2,
+  "results": [
+    {
+      "ok": true,
+      "bboxes": [
+        [
+          10,
+          20,
+          110,
+          120
+        ]
+      ],
+      "points": [
+        [
+          50,
+          60
+        ]
+      ],
+      "think": "checked"
+    },
+    {
+      "ok": true,
+      "bboxes": [
+        [
+          5,
+          5,
+          55,
+          55
+        ]
+      ],
+      "points": [
+        [
+          30,
+          30
+        ]
+      ],
+      "think": "mine"
+    },
+    {
+      "ok": false,
+      "bboxes": [],
+      "points": [],
+      "think": "no answer here"
+    },
+    {
+      "ok": true,
+      "bboxes": [
+        [
+          1,
+          2,
+          3,
+          4
+        ]
+      ],
+      "points": [
+        [
+          2,
+          3
+        ]
+      ],
+      "think": ""
+    },
+    {
+      "ok": false,
+      "bboxes": [],
+      "points": [],
+      "think": ""
+    },
+    {
+      "ok": true,
+      "bboxes": [
+        [
+          1,
+          2,
+          3,
+          4
+        ]
+      ],
+      "points": [
+        [
+          2,
+          3
+        ]
+      ],
+      "think": ""
+    },
+    {
+      "ok": true,
+      "bboxes": [
+        [
+          0,
+          0,
+          10,
+          10
+        ],
+        [
+          20,
+          20,
+          40,
+          40
+        ]
+      ],
+      "points": [
+        [
+          2,
+          3
+        ],
+        [
+          30,
+          30
+        ]
+      ],
+      "think": ""
+    },
+    {
+      "ok": true,
+      "bboxes": [
+        [
+          0,
+          0,
+          0,
+          0
+        ]
+      ],
+      "points": [
+        [
+          0,
+          0
+        ]
+      ],
+      "think": ""
+    },
+    {
+      "ok": true,
+      "bboxes": [
+        [
+          1,
+          1,
+          2,
+          2
+        ]
+      ],
+      "points": [
+        [
+          1,
+          1
+        ]
+      ],
+      "think": "analysis"
+    },
+    {
+      "ok": true,
+      "bboxes": [
+        [
+          1,
+          2,
+          3,
+          4
+        ]
+      ],
+      "points": [
+        [
+          5,
+          6
+        ]
+      ],
+      "think": "ok"
+    }
+  ]
+}

@@ -11,7 +11,6 @@
 source ~/.bashrc
 conda init
 conda activate visionreasoner_backup
-# cd /home/gaash/Wasif/Seg-Zero/training_scripts/
-# bash run_visionreasoner_7b_4x80G.sh
+cd /home/gaash/Wasif/Seg-Zero/training_scripts/
 
-python read_arrow_file.py
+python model_merger_final.py --local_dir /home/gaash/Wasif/Tawheed/Rmot/Saved_Checkpoints/run_visionreasoner_7b_4x80G/global_step_7196/actor

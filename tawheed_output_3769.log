@@ -1,0 +1,26 @@
+no change     /apps/anaconda3/condabin/conda
+no change     /apps/anaconda3/bin/conda
+no change     /apps/anaconda3/bin/conda-env
+no change     /apps/anaconda3/bin/activate
+no change     /apps/anaconda3/bin/deactivate
+no change     /apps/anaconda3/etc/profile.d/conda.sh
+no change     /apps/anaconda3/etc/fish/conf.d/conda.fish
+no change     /apps/anaconda3/shell/condabin/Conda.psm1
+no change     /apps/anaconda3/shell/condabin/conda-hook.ps1
+no change     /apps/anaconda3/lib/python3.11/site-packages/xontrib/conda.xsh
+no change     /apps/anaconda3/etc/profile.d/conda.csh
+no change     /home/gaash/.bashrc
+No action taken.
+--- Starting Simplified Model Merge for Single-GPU Checkpoint ---
+  चेकपॉइंट डायरेक्टरी (Checkpoint Directory): /home/gaash/Wasif/Tawheed/Rmot/Saved_Checkpoints/run_visionreasoner_7b_4x80G/global_step_7196/actor
+Found all necessary files and directories.
+Loading state dictionary from: /home/gaash/Wasif/Tawheed/Rmot/Saved_Checkpoints/run_visionreasoner_7b_4x80G/global_step_7196/actor/model_world_size_1_rank_0.pt
+State dictionary loaded successfully.
+Loading model configuration from: /home/gaash/Wasif/Tawheed/Rmot/Saved_Checkpoints/run_visionreasoner_7b_4x80G/global_step_7196/actor/huggingface
+Identified model architecture: Qwen2_5_VLForConditionalGeneration
+Creating empty model structure on CPU...
+Empty model created.
+Saving final merged model to: /home/gaash/Wasif/Tawheed/Rmot/Saved_Checkpoints/run_visionreasoner_7b_4x80G/global_step_7196/actor/huggingface
+
+--- Merge Complete! ---
+Your final, usable Hugging Face model is now saved in: /home/gaash/Wasif/Tawheed/Rmot/Saved_Checkpoints/run_visionreasoner_7b_4x80G/global_step_7196/actor/huggingface
