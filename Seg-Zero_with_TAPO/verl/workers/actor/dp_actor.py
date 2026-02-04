@@ -17,20 +17,27 @@ Implement Actor
 
 import os
 from collections import defaultdict
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict, Optional
 
 import torch
+from einops import rearrange
+from ray.experimental.tqdm_ray import tqdm
 from torch import nn
 from torch.distributed.fsdp import FullyShardedDataParallel as FSDP
-from tqdm import tqdm
 
-import verl.utils.torch_functional as verl_F
-from verl import DataProto
-from verl.trainer import core_algos
-from verl.utils.py_functional import append_to_dict
-from verl.utils.torch_functional import logprobs_from_logits, masked_mean
-from verl.workers.actor.base import BasePPOActor
-from verl.workers.actor.config import ActorConfig
+from ...protocol import DataProto
+from ...trainer.core_algos import average_loss, compute_kl, compute_policy_loss
+from ...utils import torch_functional as VF
+from ...utils.py_functional import append_to_dict
+from ...utils.ulysses import gather_outputs_and_unpad, ulysses_pad_and_slice_inputs
+from .base import BasePPOActor
+from .config import ActorConfig
+
+
+try:
+    from flash_attn.bert_padding import index_first_axis, pad_input, rearrange, unpad_input
+except ImportError:
+    pass
 
 
 __all__ = ["DataParallelPPOActor"]
@@ -50,17 +57,18 @@ class DataParallelPPOActor(BasePPOActor):
         self.rank = int(os.getenv("RANK", "0"))
         self.actor_module = actor_module
         self.actor_optimizer = actor_optimizer
-        self.compute_entropy_from_logits = torch.compile(verl_F.entropy_from_logits, dynamic=True)
+        if config.use_torch_compile:
+            self.log_probs_from_logits = torch.compile(VF.log_probs_from_logits, dynamic=True)
+        else:
+            self.log_probs_from_logits = VF.log_probs_from_logits
 
-    def _forward_micro_batch(
-        self, micro_batch: Dict[str, torch.Tensor], temperature: float
-    ) -> Tuple[torch.Tensor, torch.Tensor]:
+    def _forward_micro_batch(self, micro_batch: Dict[str, torch.Tensor], temperature: float) -> torch.Tensor:
         """
         Returns:
-            entropy: # (bs, response_len)
             log_probs: # (bs, response_len)
         """
         input_ids = micro_batch["input_ids"]
+        batch_size, seqlen = input_ids.shape
         attention_mask = micro_batch["attention_mask"]
         position_ids = micro_batch["position_ids"]
         responses = micro_batch["responses"]
@@ -68,29 +76,87 @@ class DataParallelPPOActor(BasePPOActor):
         if position_ids.dim() == 3:  # qwen2vl mrope
             position_ids = position_ids.transpose(0, 1)  # (bsz, 3, seqlen) -> (3, bsz, seqlen)
 
-        vision_inputs = {}
-        if "pixel_values" in micro_batch:
-            vision_inputs["pixel_values"] = torch.cat(micro_batch["pixel_values"], dim=0)
-            vision_inputs["image_grid_thw"] = torch.cat(micro_batch["image_grid_thw"], dim=0)
+        multi_modal_inputs = defaultdict(list)
+        if "multi_modal_inputs" in micro_batch:
+            for input_dict in micro_batch["multi_modal_inputs"]:
+                for key, value in input_dict.items():
+                    multi_modal_inputs[key].append(value)
+
+            for key, value in multi_modal_inputs.items():
+                if len(value) != 0:
+                    multi_modal_inputs[key] = torch.cat(value, dim=0)
+                else:
+                    multi_modal_inputs[key] = None
 
         if self.config.padding_free:
-            # TODO (yaowei): preprocess data for padding_free and ulysses
-            raise NotImplementedError
+            input_ids_rmpad, indices, *_ = unpad_input(
+                input_ids.unsqueeze(-1), attention_mask
+            )  # input_ids_rmpad (total_nnz, ...)
+            input_ids_rmpad = input_ids_rmpad.transpose(0, 1)  # (1, total_nnz)
+
+            # unpad the position_ids to align the rotary
+            if position_ids.dim() == 3:
+                position_ids_rmpad = (
+                    index_first_axis(rearrange(position_ids, "c b s ... -> (b s) c ..."), indices)
+                    .transpose(0, 1)
+                    .unsqueeze(1)
+                )  # (3, bsz, seqlen) -> (3, 1, bsz * seqlen)
+            else:
+                position_ids_rmpad = index_first_axis(
+                    rearrange(position_ids.unsqueeze(-1), "b s ... -> (b s) ..."), indices
+                ).transpose(0, 1)
+
+            # for compute the log_prob
+            input_ids_rmpad_rolled = torch.roll(input_ids_rmpad, shifts=-1, dims=1)  # (1, total_nnz)
+
+            # pad and slice the inputs if sp > 1
+            if self.config.ulysses_size > 1:
+                input_ids_rmpad, position_ids_rmpad, pad_size = ulysses_pad_and_slice_inputs(
+                    input_ids_rmpad, position_ids_rmpad, sp_size=self.config.ulysses_size
+                )
+                input_ids_rmpad_rolled, _, _ = ulysses_pad_and_slice_inputs(
+                    input_ids_rmpad_rolled, None, self.config.ulysses_size
+                )
+
+            input_ids_rmpad_rolled = input_ids_rmpad_rolled.squeeze(0)  # ((total_nnz / sp) + pad)
+
+            # only pass input_ids and position_ids to enable flash_attn_varlen
+            output = self.actor_module(
+                input_ids=input_ids_rmpad,
+                attention_mask=None,
+                position_ids=position_ids_rmpad,
+                **multi_modal_inputs,
+                use_cache=False,
+            )  # prevent model thinks we are generating
+            logits_rmpad = output.logits.squeeze(0)  # (total_nnz, vocab_size)
+            logits_rmpad.div_(temperature)
+            # ((total_nnz / sp) + pad)
+            log_probs = self.log_probs_from_logits(logits=logits_rmpad, labels=input_ids_rmpad_rolled)
+
+            # gather log_prob if sp > 1
+            if self.config.ulysses_size > 1:
+                # gather and unpad for the ulysses sp
+                log_probs = gather_outputs_and_unpad(log_probs, gather_dim=0, unpad_dim=0, padding_size=pad_size)
+
+            # pad back to (bsz, seqlen)
+            full_log_probs = pad_input(
+                hidden_states=log_probs.unsqueeze(-1), indices=indices, batch=batch_size, seqlen=seqlen
+            )
+            log_probs = full_log_probs.squeeze(-1)[:, -response_length - 1 : -1]  # (bsz, response_length)
         else:
             output = self.actor_module(
                 input_ids=input_ids,
                 attention_mask=attention_mask,
                 position_ids=position_ids,
-                **vision_inputs,
+                **multi_modal_inputs,
                 use_cache=False,
             )
             logits: torch.Tensor = output.logits
             logits.div_(temperature)
             logits = logits[:, -response_length - 1 : -1, :]  # (bsz, response_length, vocab_size)
-            log_probs = logprobs_from_logits(logits, responses)  # (bsz, response_length)
-            entropy = verl_F.entropy_from_logits(logits)  # (bsz, response_length)
+            log_probs = self.log_probs_from_logits(logits, responses)  # (bsz, response_length)
 
-        return entropy, log_probs
+        return log_probs
 
     def _optimizer_step(self) -> torch.Tensor:
         if isinstance(self.actor_module, FSDP):
@@ -98,7 +164,12 @@ class DataParallelPPOActor(BasePPOActor):
         else:
             grad_norm = nn.utils.clip_grad_norm_(self.actor_module.parameters(), max_norm=self.config.max_grad_norm)
 
-        self.actor_optimizer.step()
+        if not torch.isfinite(grad_norm):
+            print("Gradient norm is not finite. Skip update.")
+        else:
+            self.actor_optimizer.step()
+
+        self.actor_optimizer.zero_grad()
         return grad_norm
 
     @torch.no_grad()
@@ -124,19 +195,18 @@ class DataParallelPPOActor(BasePPOActor):
 
         temperature = data.meta_info["temperature"]
         select_keys = ["responses", "input_ids", "attention_mask", "position_ids"]
-        if "pixel_values" in data.non_tensor_batch.keys():
-            non_tensor_select_keys = ["pixel_values", "image_grid_thw"]
-        else:
-            non_tensor_select_keys = None
+        non_tensor_select_keys = ["multi_modal_inputs"]
 
         micro_batches = data.select(select_keys, non_tensor_select_keys).split(
             self.config.micro_batch_size_per_device_for_experience
         )
         log_probs_lst = []
-        for micro_batch in tqdm(micro_batches, desc="Compute log probs", disable=(self.rank != 0)):
-            micro_batch.to("cuda")
+        if self.rank == 0:
+            micro_batches = tqdm(micro_batches, desc="Compute log probs", position=1)
+
+        for micro_batch in micro_batches:
             model_inputs = {**micro_batch.batch, **micro_batch.non_tensor_batch}
-            _, log_probs = self._forward_micro_batch(model_inputs, temperature=temperature)
+            log_probs = self._forward_micro_batch(model_inputs, temperature=temperature)
             log_probs_lst.append(log_probs)
 
         log_probs = torch.concat(log_probs_lst, dim=0)
@@ -146,84 +216,171 @@ class DataParallelPPOActor(BasePPOActor):
         self.actor_module.train()
 
         temperature = data.meta_info["temperature"]  # temperature must be in the data.meta_info to avoid slient error
-        select_keys = ["responses", "input_ids", "attention_mask", "position_ids", "old_log_probs", "advantages"]
-        if self.config.use_kl_loss:
-            select_keys.append("ref_log_prob")
+        select_keys = ["responses", "input_ids", "attention_mask", "position_ids"]
+        select_keys.extend(["old_log_probs", "ref_log_probs", "advantages"])
+        non_tensor_select_keys = ["multi_modal_inputs"]
 
-        if "pixel_values" in data.non_tensor_batch.keys():
-            non_tensor_select_keys = ["pixel_values", "image_grid_thw"]
-        else:
-            non_tensor_select_keys = None
+        # for contrastive kl
+        if "aug_log_probs" in data.batch.keys() and self.config.use_kl_prcp:
+            select_keys.append("aug_log_probs")
+            non_tensor_select_keys.append("kl_prcp_weighting")
+            non_tensor_select_keys.append("kl_prcp_coef")
+        
+        if self.config.use_sft_loss:
+            non_tensor_select_keys.append("correctness_mult_mask")
 
-        # TODO (yaowei): support ppo epochs
         # Split to make minibatch iterator for updating the actor
         # See PPO paper for details. https://arxiv.org/abs/1707.06347
         mini_batches = data.select(select_keys, non_tensor_select_keys).split(self.config.global_batch_size_per_device)
 
         metrics = defaultdict(list)
-        n = len(mini_batches)
-        for i, mini_batch in enumerate(mini_batches):
-            gradient_accumulation = (
-                self.config.global_batch_size_per_device // self.config.micro_batch_size_per_device_for_update
-            )
-            micro_batches = mini_batch.split(self.config.micro_batch_size_per_device_for_update)
+        for _ in range(self.config.ppo_epochs):
+            if self.rank == 0:
+                mini_batches = tqdm(mini_batches, desc="Train mini-batches", position=1)
 
-            self.actor_optimizer.zero_grad()
-            for micro_batch in tqdm(micro_batches, desc=f"Update policy [{i + 1}/{n}]", disable=(self.rank != 0)):
-                micro_batch.to("cuda")
-                model_inputs = {**micro_batch.batch, **micro_batch.non_tensor_batch}
-                responses = model_inputs["responses"]
-                response_length = responses.size(1)
-                attention_mask = model_inputs["attention_mask"]
-                response_mask = attention_mask[:, -response_length:]
-                old_log_prob = model_inputs["old_log_probs"]
-                advantages = model_inputs["advantages"]
-
-                clip_ratio = self.config.clip_ratio
-                entropy_coeff = self.config.entropy_coeff
-
-                # all return: (bsz, response_length)
-                entropy, log_prob = self._forward_micro_batch(model_inputs, temperature=temperature)
-
-                pg_loss, pg_clipfrac, ppo_kl = core_algos.compute_policy_loss(
-                    old_log_prob=old_log_prob,
-                    log_prob=log_prob,
-                    advantages=advantages,
-                    eos_mask=response_mask,
-                    cliprange=clip_ratio,
+            for mini_batch in mini_batches:
+                gradient_accumulation = (
+                    self.config.global_batch_size_per_device // self.config.micro_batch_size_per_device_for_update
                 )
-                # compute entropy loss from entropy
-                entropy_loss = verl_F.masked_mean(entropy, response_mask)
+                micro_batches = mini_batch.split(self.config.micro_batch_size_per_device_for_update)
+                if self.rank == 0:
+                    micro_batches = tqdm(micro_batches, desc="Update policy", position=2)
 
-                # compute policy loss
-                policy_loss = pg_loss - entropy_loss * entropy_coeff
+                for micro_batch in micro_batches:
+                    # for kl prcp
+                    kl_prcp_weighting = micro_batch.non_tensor_batch.pop("kl_prcp_weighting", None)
+                    kl_prcp_coef = micro_batch.non_tensor_batch.pop("kl_prcp_coef", None)
 
-                if self.config.use_kl_loss:
-                    ref_log_prob = model_inputs["ref_log_prob"]
-                    # compute kl loss
-                    kld = core_algos.kl_penalty(
-                        logprob=log_prob,
-                        ref_logprob=ref_log_prob,
-                        kl_penalty=self.config.kl_loss_type,
+                    # for sft loss
+                    correctness_mult_mask = micro_batch.non_tensor_batch.pop("correctness_mult_mask", None)
+
+                    model_inputs = {**micro_batch.batch, **micro_batch.non_tensor_batch}
+                    responses = model_inputs["responses"]
+                    response_length = responses.size(1)
+                    attention_mask = model_inputs["attention_mask"]
+                    response_mask = attention_mask[:, -response_length:]
+                    old_log_probs = model_inputs["old_log_probs"]
+                    advantages = model_inputs["advantages"]
+
+                    # all return: (bsz, response_length)
+                    log_probs = self._forward_micro_batch(model_inputs, temperature=temperature)
+                    entropy_loss = -VF.masked_mean(log_probs, response_mask)  # estimator of entropy loss
+
+                    pg_loss, pg_metrics = compute_policy_loss(
+                        old_log_probs=old_log_probs,
+                        log_probs=log_probs,
+                        advantages=advantages,
+                        response_mask=response_mask,
+                        clip_ratio_low=self.config.clip_ratio_low,
+                        clip_ratio_high=self.config.clip_ratio_high,
+                        clip_ratio_dual=self.config.clip_ratio_dual,
+                        loss_avg_mode=self.config.loss_avg_mode,
                     )
-                    kl_loss = masked_mean(kld, response_mask)
-                    policy_loss = policy_loss + kl_loss * self.config.kl_loss_coef
-                    metrics["actor/kl_loss"] = kl_loss.detach().item()
-                    metrics["actor/kl_coef"] = self.config.kl_loss_coef
+                    if self.config.use_kl_loss and "ref_log_probs" in model_inputs:
+                        ref_log_probs = model_inputs["ref_log_probs"]
+                        # compute kl loss
+                        kld = compute_kl(
+                            log_probs=log_probs,
+                            ref_log_probs=ref_log_probs,
+                            kl_penalty=self.config.kl_penalty,
+                        )
+                        kl_loss = average_loss(kld, response_mask, mode=self.config.loss_avg_mode)
+                        pg_loss = pg_loss + kl_loss * self.config.kl_coef
+                        metrics["actor/kl_loss"] = kl_loss.detach().item()
+                        metrics["actor/kl_coef"] = self.config.kl_coef
 
-                loss = policy_loss / gradient_accumulation
-                loss.backward()
+                    discount_ratio = 1.0 # for entropy losses; maybe updated by annealing kl_prcp settings
+                    
+                    # for kl_prcp
+                    if "aug_log_probs" in model_inputs:
+                        aug_log_probs = model_inputs["aug_log_probs"]
+                        aug_entropy_loss = -VF.masked_mean(aug_log_probs, response_mask)  # estimator of entropy loss
+                        
+                        # compute kl_prcp
+                        aug_kld = compute_kl(
+                            log_probs=log_probs,
+                            ref_log_probs=aug_log_probs,
+                            kl_penalty=self.config.kl_prcp_penalty,
+                        )
+                        
+                        # turn contastive_kl_weighting to tensor
+                        kl_prcp_weighting = torch.tensor(kl_prcp_weighting, device=aug_kld.device, dtype=aug_kld.dtype)
+                        kl_prcp_weighting = kl_prcp_weighting.unsqueeze(1) # (bsz, 1)
+                        aug_kld = aug_kld * kl_prcp_weighting
 
-                batch_metrics = {
-                    "actor/entropy_loss": entropy_loss.detach().item(),
-                    "actor/pg_loss": pg_loss.detach().item(),
-                    "actor/pg_clipfrac": pg_clipfrac.detach().item(),
-                    "actor/ppo_kl": ppo_kl.detach().item(),
-                }
-                append_to_dict(metrics, batch_metrics)
+                        # if add additional token-level masking
+                        if self.config.use_kl_prcp_token_level_mask:
+                            top_p = self.config.kl_prcp_token_level_mask_top_p
+                            assert top_p > 0.0 and top_p < 1.0, "top_p must be in (0, 1) for token-level masking"
+                            # --- Only keep *valid* tokens when computing the per-sample threshold -------------
+                            valid_mask = response_mask.bool()                     # (bsz, resp_len)
+                            masked_kld = aug_kld.masked_fill(~valid_mask, float("nan"))
+                            thresh = torch.nanquantile(masked_kld, 1.0 - top_p, dim=1, keepdim=True)
+                            token_mask = aug_kld >= thresh          # (bsz, resp_len)  bool
+                            # Apply the mask (cast to same dtype)
+                            aug_kld = aug_kld * token_mask.to(aug_kld.dtype)
 
-            grad_norm = self._optimizer_step()
-            append_to_dict(metrics, {"actor/grad_norm": grad_norm.detach().item()})
+                        # if add kl_prcp clipping
+                        if self.config.use_kl_prcp_clipping:
+                            aug_kld = torch.clamp(aug_kld, min=0.0, max=self.config.kl_prcp_clipping)
 
-        self.actor_optimizer.zero_grad()
+                        # kl_prcp loss
+                        kl_prcp_loss = average_loss(aug_kld, response_mask, mode=self.config.loss_avg_mode)
+
+                        if kl_prcp_coef is None:
+                            kl_prcp_coef = self.config.kl_prcp_coef
+                        else:
+                            kl_prcp_coef = kl_prcp_coef[0] # an array of identical values, take the first one
+                        
+                        # if annealing; applying the same discount to aug_entropy_loss
+                        if kl_prcp_coef != self.config.kl_prcp_coef:
+                            discount_ratio = kl_prcp_coef / self.config.kl_prcp_coef
+
+                        pg_loss = pg_loss - kl_prcp_loss * kl_prcp_coef
+
+                        # if adding masked entropy loss
+                        if self.config.use_aug_entropy_loss:
+                            pg_loss = pg_loss + self.config.aug_entropy_loss_coef * discount_ratio * aug_entropy_loss
+
+                        metrics["actor/kl_prcp_loss"] = - kl_prcp_loss.detach().item()
+                        metrics["actor/kl_prcp_coef"] = kl_prcp_coef
+                        metrics["actor/kl_prcp_coef_annealing_discount"] = discount_ratio
+                        metrics["actor/aug_entropy_loss"] = aug_entropy_loss.detach().item()
+                        metrics["actor/aug_entropy_loss_coef"] = self.config.aug_entropy_loss_coef     
+
+                    if self.config.use_ori_entropy_loss:
+                        pg_loss = pg_loss + self.config.ori_entropy_loss_coef * discount_ratio * entropy_loss
+                        metrics["actor/ori_entropy_loss"] = entropy_loss.detach().item()
+                        metrics["actor/ori_entropy_loss_coef"] = self.config.ori_entropy_loss_coef
+
+                    # if adding additional sft loss on correct rollouts
+                    if self.config.use_sft_loss:
+                        assert correctness_mult_mask is not None, "correctness_mult_mask must be provided when use_sft_loss is True"
+                        correctness_mult_mask = torch.tensor(correctness_mult_mask, device=log_probs.device, dtype=log_probs.dtype) # (bsz,) 0.0 or 1.0
+                        # token-level mask = response tokens that belong to *correct* samples
+                        combined_mask = response_mask * correctness_mult_mask.unsqueeze(1)      # (bsz, response_len)
+                        # negative log-probability (NLL) of the chosen tokens
+                        sft_loss = VF.masked_mean(-log_probs, combined_mask)                    # scalar
+                        sft_coef = self.config.sft_loss_coef # default to 1e-3
+                        # add sft loss to pg_loss
+                        pg_loss = pg_loss + sft_coef * sft_loss
+                        # logging
+                        metrics["actor/sft_loss"] = sft_loss.detach().item()
+                        metrics["actor/sft_coef"] = sft_coef               
+
+                    loss = pg_loss / gradient_accumulation
+                    loss.backward()
+
+                    batch_metrics = {
+                        "actor/pg_loss": pg_loss.detach().item(),
+                        "actor/pg_clipfrac_higher": pg_metrics["pg_clipfrac_higher"],
+                        "actor/pg_clipfrac_lower": pg_metrics["pg_clipfrac_lower"],
+                        "actor/entropy_loss": pg_metrics["entropy_loss"],
+                        "actor/ppo_kl": pg_metrics["ppo_kl"],
+                    }
+                    append_to_dict(metrics, batch_metrics)
+
+                grad_norm = self._optimizer_step()
+                append_to_dict(metrics, {"actor/grad_norm": grad_norm.detach().item()})
+
         return metrics
