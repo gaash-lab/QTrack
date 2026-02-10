@@ -65,12 +65,16 @@ class FSDPConfig:
     mp_param_dtype: str = "bf16"
     mp_reduce_dtype: str = "fp32"
     mp_buffer_dtype: str = "fp32"
+    param_offload: bool = False
+    optimizer_offload: bool = False
+
 
 
 @dataclass
 class OffloadConfig:
-    offload_params: bool = False
-    offload_optimizer: bool = False
+    offload_params: bool = True
+    offload_optimizer: bool = True
+    # param_offload: bool = True
 
 
 @dataclass
@@ -97,6 +101,11 @@ class ActorConfig:
     padding_free: bool = True
     """use padding-free training"""
     ulysses_size: int = 1
+
+    """TAPO config"""
+    kl_loss_coef: float = 5.0e-3
+    kl_loss_type: str = "low_var_kl"
+
     """ulysses sequence parallel size"""
     use_torch_compile: bool = True
     model: ModelConfig = field(default_factory=ModelConfig)

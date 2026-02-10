@@ -14,7 +14,7 @@
 
 from abc import ABC, abstractmethod
 
-from ...protocol import DataProto
+from verl import DataProto
 
 
 __all__ = ["BaseRollout"]

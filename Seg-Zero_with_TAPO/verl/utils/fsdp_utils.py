@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import gc
 from collections import defaultdict
 from functools import partial
 from typing import Callable, Union
@@ -74,7 +73,6 @@ def offload_fsdp_model(model: FSDP, empty_cache: bool = True):
     for handle in model._all_handles:
         if handle._offload_params:
             continue
-
         flat_param = handle.flat_param
         assert (
             flat_param.data.data_ptr() == flat_param._local_shard.data_ptr()
@@ -91,7 +89,7 @@ def offload_fsdp_model(model: FSDP, empty_cache: bool = True):
 
 
 @torch.no_grad()
-def load_fsdp_model(model: FSDP, empty_cache: bool = True):
+def load_fsdp_model(model: FSDP):
     # lazy init FSDP model
     _lazy_init(model, model)
     assert model._is_root, "Only support root model loading to GPU"
@@ -104,15 +102,11 @@ def load_fsdp_model(model: FSDP, empty_cache: bool = True):
         # the following still keeps id(._local_shard) != id(.data)
         flat_param._local_shard = flat_param.data
 
-    if empty_cache:
-        gc.collect()
-
 
 @torch.no_grad()
-def offload_fsdp_optimizer(optimizer: Optimizer, empty_cache: bool = True):
+def offload_fsdp_optimizer(optimizer: Optimizer):
     if not optimizer.state:
         return
-
     for param_group in optimizer.param_groups:
         for param in param_group["params"]:
             state = optimizer.state[param]
@@ -120,21 +114,14 @@ def offload_fsdp_optimizer(optimizer: Optimizer, empty_cache: bool = True):
                 if isinstance(value, torch.Tensor):
                     state[key] = value.to("cpu", non_blocking=True)
 
-    if empty_cache:
-        torch.cuda.empty_cache()
-
 
 @torch.no_grad()
-def load_fsdp_optimizer(optimizer: Optimizer, empty_cache: bool = True):
+def load_fsdp_optimizer(optimizer: Optimizer):
     if not optimizer.state:
         return
-
     for param_group in optimizer.param_groups:
         for param in param_group["params"]:
             state = optimizer.state[param]
             for key, value in state.items():
                 if isinstance(value, torch.Tensor):
                     state[key] = value.to("cuda", non_blocking=True)
-
-    if empty_cache:
-        gc.collect()

@@ -1,5 +1,5 @@
 data:
-  train_files: /home/gaash/Wasif/Seg-Zero/data/MOT_grounding_Dataset/hf_dataset
+  train_files: /home/gaash/Wasif/Seg-Zero/data/MOT_grounding_Dataset/hf_dataset_mcp_new
   val_files: None
   prompt_key: problem
   max_prompt_length: 1300
@@ -14,9 +14,11 @@ algorithm:
   adv_estimator: grpo
   kl_coef: 0.0
   use_kl_prcp: true
-  temporal_corruption_type: freeze 
-  static_penalty: 0.2
-  kl_prcp_coef: 5.0e-3
+  kl_penalty: "kl"
+  tapo_stratergy: "freeze"
+  tapo_keep_prob: 0.7
+  tapo_interval: 2
+  tapo_kl_weight: 0.1
 
 worker:
   actor:

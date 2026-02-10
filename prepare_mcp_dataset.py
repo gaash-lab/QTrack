@@ -10,7 +10,7 @@ import numpy as np
 DATASET_ROOT = Path("/home/gaash/Wasif/Tawheed/MOT_grounding_Dataset")
 TRAIN_DIR = DATASET_ROOT / "train"
 JSONL_PATH = TRAIN_DIR / "train_split_1.jsonl"
-OUTPUT_PATH = DATASET_ROOT / "hf_dataset_mcp"  # new output folder
+OUTPUT_PATH = DATASET_ROOT / "hf_dataset_mcp_new"  # new output folder
 
 # def xyxy_to_xywh(box):
 #     """Convert [x1, y1, x2, y2] -> [x, y, w, h]"""
@@ -82,6 +82,16 @@ def main():
                             "curr": [{"bbox_2d": curr_bbox}]
                         }
                     })
+                    # records.append({
+                    #     "id": f"{obj_id}_frame{curr_bbox_json[0]['frame']}",
+                    #     "images": [img_pil],  # keep for readability
+                    #     "multi_modal_data": [{"image": img_pil}],  # vLLM expects this key
+                    #     "problem": entry["prompt"],
+                    #     "solution": {
+                    #         "prev": [{"bbox_2d": prev_bbox}],
+                    #         "curr": [{"bbox_2d": curr_bbox}]
+                    #     }
+                    # })
 
                 prev_bbox = curr_bbox
                 prev_image = img_pil

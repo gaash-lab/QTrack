@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .config import CriticConfig
+from .base import BasePPOCritic
+from .config import CriticConfig, ModelConfig
+from .dp_critic import DataParallelPPOCritic
 
 
-__all__ = ["CriticConfig"]
+__all__ = ["BasePPOCritic", "CriticConfig", "DataParallelPPOCritic", "ModelConfig"]

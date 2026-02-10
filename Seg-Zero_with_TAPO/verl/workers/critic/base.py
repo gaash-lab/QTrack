@@ -20,8 +20,8 @@ from typing import Any, Dict
 
 import torch
 
-from ...protocol import DataProto
-from .config import CriticConfig
+from verl import DataProto
+from verl.workers.critic.config import CriticConfig
 
 
 __all__ = ["BasePPOCritic"]

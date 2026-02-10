@@ -18,13 +18,11 @@ the class for Worker
 import os
 import socket
 from dataclasses import dataclass
-from typing import Tuple
 
 import ray
-import torch
 
-from .decorator import Dispatch, Execute, register
-from .register_center.ray import create_worker_group_register_center
+from verl.single_controller.base.decorator import Dispatch, Execute, register
+from verl.single_controller.base.register_center.ray import create_worker_group_register_center
 
 
 @dataclass
@@ -42,7 +40,7 @@ class DistGlobalInfo:
 
 
 class WorkerHelper:
-    def _get_node_ip(self) -> str:
+    def _get_node_ip(self):
         host_ipv4 = os.getenv("MY_HOST_IP", None)
         host_ipv6 = os.getenv("MY_HOST_IPV6", None)
         host_ip_by_env = host_ipv4 or host_ipv6
@@ -51,12 +49,12 @@ class WorkerHelper:
         host_ip = host_ip_by_env or host_ip_by_sdk
         return host_ip
 
-    def _get_free_port(self) -> int:
+    def _get_free_port(self):
         with socket.socket() as sock:
             sock.bind(("", 0))
             return sock.getsockname()[1]
 
-    def get_availale_master_addr_port(self) -> Tuple[str, str]:
+    def get_availale_master_addr_port(self):
         return self._get_node_ip(), str(self._get_free_port())
 
     def _get_pid(self):
@@ -83,26 +81,16 @@ class WorkerMeta:
 
 # we assume that in each WorkerGroup, there is a Master Worker
 class Worker(WorkerHelper):
-    """A (distributed) worker."""
-
-    _world_size: int
-    _rank: int
-    _local_world_size: int
-    _local_rank: int
-    _master_addr: str
-    _master_port: str
-    _cuda_visible_devices: str
-
     def __new__(cls, *args, **kwargs):
         instance = super().__new__(cls)
 
         # note that here we use int to distinguish
-        disable_worker_init = int(os.getenv("DISABLE_WORKER_INIT", 0))
+        disable_worker_init = int(os.environ.get("DISABLE_WORKER_INIT", 0))
         if disable_worker_init:
             return instance
 
-        rank = os.getenv("RANK", None)
-        worker_group_prefix = os.getenv("WG_PREFIX", None)
+        rank = os.environ.get("RANK", None)
+        worker_group_prefix = os.environ.get("WG_PREFIX", None)
 
         # when decorator @ray.remote applies, __new__ will be called while we don't want to apply _configure_before_init
         if None not in [rank, worker_group_prefix] and "ActorClass(" not in cls.__name__:
@@ -124,19 +112,13 @@ class Worker(WorkerHelper):
 
     def __init__(self, cuda_visible_devices=None) -> None:
         # construct a meta from envrionment variable. Note that the import must be inside the class because it is executed remotely
-        world_size = int(os.getenv("WORLD_SIZE"))
-        rank = int(os.getenv("RANK"))
+        world_size = int(os.environ["WORLD_SIZE"])
+        rank = int(os.environ["RANK"])
         self._rank = rank
         self._world_size = world_size
 
-        if "AMD" in torch.cuda.get_device_name():
-            os.environ["CUDA_VISIBLE_DEVICES"] = os.getenv("ROCR_VISIBLE_DEVICES")
-            os.environ["LOCAL_RANK"] = os.getenv("RAY_LOCAL_RANK")
-            cuda_visible_devices = os.getenv("LOCAL_RANK", "0")
-            torch.cuda.set_device(int(cuda_visible_devices))
-
-        master_addr = os.getenv("MASTER_ADDR")
-        master_port = os.getenv("MASTER_PORT")
+        master_addr = os.environ["MASTER_ADDR"]
+        master_port = os.environ["MASTER_PORT"]
 
         local_world_size = int(os.getenv("LOCAL_WORLD_SIZE", "1"))
         local_rank = int(os.getenv("LOCAL_RANK", "0"))
@@ -167,7 +149,6 @@ class Worker(WorkerHelper):
             if val is not None:
                 # print(f"set {key} to {val}")
                 os.environ[key] = str(val)
-
         os.environ["REDIS_STORE_SERVER_HOST"] = (
             str(self._master_addr).replace("[", "").replace("]", "") if self._master_addr else ""
         )
@@ -176,7 +157,7 @@ class Worker(WorkerHelper):
         return self._master_addr, self._master_port
 
     def get_cuda_visible_devices(self):
-        cuda_visible_devices = os.getenv("CUDA_VISIBLE_DEVICES", "not set")
+        cuda_visible_devices = os.environ.get("CUDA_VISIBLE_DEVICES", "not set")
         return cuda_visible_devices
 
     def print_rank0(self, *args, **kwargs):

@@ -12,26 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import TYPE_CHECKING, List, Tuple
-
 import torch
+from transformers import LlamaConfig, PretrainedConfig, Qwen2Config
 
 
-if TYPE_CHECKING:
-    from transformers.models.llama.configuration_llama import LlamaConfig
+VALID_CONFIG_TYPE = (Qwen2Config, LlamaConfig)
 
 
-def get_device_flops(unit: str = "T") -> float:
-    def unit_convert(number: float, level: str):
+def get_device_flops(unit="T"):
+    def unit_convert(number, level):
         units = ["B", "K", "M", "G", "T", "P"]
         if number <= 0:
             return number
-
         ptr = 0
         while ptr < len(units) and units[ptr] != level:
             number /= 1000
             ptr += 1
-
         return number
 
     device_name = torch.cuda.get_device_name()
@@ -48,7 +44,6 @@ def get_device_flops(unit: str = "T") -> float:
         flops = 148e12
     elif "910B" in device_name:
         flops = 354e12
-
     flops_unit = unit_convert(flops, unit)
     return flops_unit
 
@@ -60,27 +55,21 @@ class FlopsCounter:
     Example:
         flops_counter = FlopsCounter(config)
         flops_achieved, flops_promised = flops_counter.estimate_flops(tokens_list, delta_time)
+
     """
 
-    def __init__(self, config: "LlamaConfig"):
-        _ESTIMATE_FUNC = {
-            "llama": self._estimate_llama_flops,
-            "qwen2": self._estimate_llama_flops,
-            "qwen2_vl": self._estimate_llama_flops,
-            "qwen2_5_vl": self._estimate_llama_flops,
-            "qwen3": self._estimate_llama_flops,
-        }
+    def __init__(self, config: PretrainedConfig):
+        if not isinstance(config, VALID_CONFIG_TYPE):
+            print(f"Only support config type of {VALID_CONFIG_TYPE}, but got {type(config)}. MFU will always be zero.")
 
-        if config.model_type not in _ESTIMATE_FUNC:
-            print(f"Only support {_ESTIMATE_FUNC.keys()}, but got {config.model_type}. MFU will always be zero.")
-
+        self.estimate_func = {"qwen2": self._estimate_qwen2_flops, "llama": self._estimate_qwen2_flops}
         self.config = config
-        self._estimate_flops = _ESTIMATE_FUNC.get(config.model_type, self._estimate_unknown_flops)
 
-    def _estimate_unknown_flops(self, tokens_sum: int, batch_seqlens: List[int], delta_time: float) -> float:
+    def _estimate_unknown_flops(self, tokens_sum, batch_seqlens, delta_time):
         return 0
 
-    def _estimate_llama_flops(self, tokens_sum: int, batch_seqlens: List[int], delta_time: float) -> float:
+    def _estimate_qwen2_flops(self, tokens_sum, batch_seqlens, delta_time):
+        assert isinstance(self.config, (Qwen2Config, LlamaConfig))
         hidden_size = self.config.hidden_size
         vocab_size = self.config.vocab_size
         num_hidden_layers = self.config.num_hidden_layers
@@ -107,7 +96,6 @@ class FlopsCounter:
         seqlen_square_sum = 0
         for seqlen in batch_seqlens:
             seqlen_square_sum += seqlen * seqlen
-
         attn_qkv_flops = 12 * seqlen_square_sum * head_dim * num_attention_heads * num_hidden_layers
 
         # all_layer & all_token fwd & bwd flops
@@ -115,7 +103,7 @@ class FlopsCounter:
         flops_achieved = flops_all_token * (1.0 / delta_time) / 1e12
         return flops_achieved
 
-    def estimate_flops(self, batch_seqlens: List[int], delta_time: float) -> Tuple[float, float]:
+    def estimate_flops(self, batch_seqlens, delta_time):
         """
         Estimate the FLOPS based on the number of valid tokens in the current batch and the time taken.
 
@@ -128,6 +116,7 @@ class FlopsCounter:
             promised_flops (float): The expected FLOPS of the current device.
         """
         tokens_sum = sum(batch_seqlens)
-        estimated_flops = self._estimate_flops(tokens_sum, batch_seqlens, delta_time)
+        func = self.estimate_func.get(self.config.model_type, self._estimate_unknown_flops)
+        estimated_flops = func(tokens_sum, batch_seqlens, delta_time)
         promised_flops = get_device_flops()
         return estimated_flops, promised_flops

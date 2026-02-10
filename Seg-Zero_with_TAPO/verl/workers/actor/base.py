@@ -20,8 +20,8 @@ from typing import Any, Dict
 
 import torch
 
-from ...protocol import DataProto
-from .config import ActorConfig
+from verl import DataProto
+from verl.workers.actor.config import ActorConfig
 
 
 __all__ = ["BasePPOActor"]

@@ -1,14 +1,14 @@
 data:
-  train_files: PAPOGalaxy/PAPO_ViRL39K_train
-  val_files: PAPOGalaxy/PAPO_MMK12_test
+  train_files: /home/gaash/Wasif/Seg-Zero/data/MOT_grounding_Dataset/hf_dataset
+  val_files: None
   prompt_key: problem
-  answer_key: answer
-  image_key: images
-  video_key: videos
-  image_dir: null
+  # answer_key: answer
+  # image_key: images
+  # video_key: videos
+  # image_dir: null
   video_fps: 2.0
-  max_prompt_length: 4096
-  max_response_length: 2048
+  max_prompt_length: 1300
+  max_response_length: 2000
   rollout_batch_size: 512  # equivalent to verl's data.train_batch_size
   mini_rollout_batch_size: 128  # equivalent to verl's data.gen_batch_size
   val_batch_size: 1024
@@ -21,7 +21,7 @@ data:
   filter_overlong_prompts: true
 
 algorithm:
-  adv_estimator: dapo
+  # adv_estimator: dapo
   disable_kl: true
   use_kl_loss: true
   kl_penalty: low_var_kl
@@ -30,6 +30,9 @@ algorithm:
   filter_key: overall
   filter_low: 0.01
   filter_high: 0.99
+  adv_estimator: grpo
+  temporal_corruption_type: freeze 
+  static_penalty: 0.2
 
   use_kl_prcp: true
   contrastive_type: augmented

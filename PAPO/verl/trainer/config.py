@@ -107,7 +107,7 @@ class AlgorithmConfig:
 
     
     """kl_prcp for papo"""
-    use_kl_prcp: bool = False
+    use_kl_prcp: bool = True
     contrastive_type: str = "augmented"
     kl_prcp_schedule: str = "fixed"
     kl_prcp_schedule_args: Dict[str, Any] = field(default_factory=dict)
@@ -116,6 +116,11 @@ class AlgorithmConfig:
     kl_prcp_apply_mode: str = "all"
     aug_config: Dict[str, Any] = field(default_factory=dict)
     incorrect_weighting: float = 0.1
+
+    """TAPO config"""
+    temporal_corruption_type: str = "freeze"
+    static_penalty: float = 0.2
+    kl_prcp_coef: float = 5.0e-3
 
     """double Entropy Loss"""
     use_aug_entropy_loss: bool = False

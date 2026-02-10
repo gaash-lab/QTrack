@@ -9,8 +9,8 @@ export MODEL_PATH=/home/gaash/Wasif/Tawheed/Seg-Zero/pretrained_models/Qwen2.5-V
 RUN_NAME=$(basename "$0" .sh)
 
 python3 -m verl.trainer.main \
-    config=/home/gaash/Wasif/Tawheed/Seg-Zero/training_scripts/visionreasoner_7b.yaml \
-    data.train_files=/home/gaash/Wasif/Tawheed/MOT_grounding_Dataset/hf_dataset_mcp \
+    config=/home/gaash/Wasif/Tawheed/Seg-Zero_with_TAPO/training_scripts/visionreasoner_7b.yaml \
+    data.train_files=/home/gaash/Wasif/Tawheed/MOT_grounding_Dataset/hf_dataset_mcp_new \
     data.val_files=None \
     worker.actor.model.model_path=${MODEL_PATH} \
     worker.actor.kl_loss_coef=1.0e-2 \
@@ -25,4 +25,4 @@ python3 -m verl.trainer.main \
     trainer.experiment_name=${RUN_NAME} \
     trainer.n_gpus_per_node=1 \
     trainer.total_episodes=4 \
-    trainer.save_checkpoint_path=/home/gaash/Wasif/Tawheed/Rmot/Saved_Checkpoints/MCP_Reward/${RUN_NAME}
+    trainer.save_checkpoint_path=/home/gaash/Wasif/Tawheed/Rmot/Saved_Checkpoints/TAPO/${RUN_NAME}

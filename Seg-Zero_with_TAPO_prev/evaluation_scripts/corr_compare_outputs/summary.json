@@ -1,0 +1,61 @@
+{
+  "paths": {
+    "baseline": "/home/gaash/Wasif/Seg-Zero/reasonseg_eval_results/STS(baseline)/Combined_1016/output_0.json",
+    "exp5": "/home/gaash/Wasif/Seg-Zero/reasonseg_eval_results/exp5/Combined_1016/output_0.json"
+  },
+  "settings": {
+    "pass_thresh": 0.5,
+    "reasoning_len_cutoff": 3
+  },
+  "baseline_stats": {
+    "n": 1071,
+    "mean_iou": 0.37351078492421913,
+    "median_iou": 0.15361510958733632,
+    "pass_rate": 0.39215686274509803,
+    "reasoning_fail_count": 68,
+    "pearson_char": {
+      "r": 0.1318796343965998,
+      "p": 1.4924819590064615e-05
+    },
+    "spearman_char": {
+      "r": 0.08942571762242423,
+      "p": 0.0034004274157490755
+    },
+    "pearson_word": {
+      "r": 0.13626378750721874,
+      "p": 7.638695651304285e-06
+    },
+    "spearman_word": {
+      "r": 0.09333622984285732,
+      "p": 0.0022308441220945797
+    }
+  },
+  "exp5_stats": {
+    "n": 1071,
+    "mean_iou": 0.3996182115986472,
+    "median_iou": 0.21699355312888632,
+    "pass_rate": 0.419234360410831,
+    "reasoning_fail_count": 3,
+    "pearson_char": {
+      "r": 0.009642605358824422,
+      "p": 0.7526067378043694
+    },
+    "spearman_char": {
+      "r": 0.013612549381035111,
+      "p": 0.6563294793355103
+    },
+    "pearson_word": {
+      "r": 0.028108158869244376,
+      "p": 0.35810665065098574
+    },
+    "spearman_word": {
+      "r": 0.03566236410822127,
+      "p": 0.24357424478005504
+    }
+  },
+  "deltas": {
+    "mean_iou": 0.026107426674428058,
+    "pass_rate": 0.027077497665732975,
+    "reasoning_fail_count": 65
+  }
+}

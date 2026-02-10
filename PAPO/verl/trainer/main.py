@@ -68,17 +68,21 @@ class Runner:
         }
         resource_pool_manager = ResourcePoolManager(resource_pool_spec=resource_pool_spec, mapping=mapping)
 
-        if config.worker.reward.reward_type == "sequential":
-            RewardManager = SequentialFunctionRewardManager
-        elif config.worker.reward.reward_type == "batch":
-            RewardManager = BatchFunctionRewardManager
-        else:
-            raise NotImplementedError(f"Unknown reward type {config.worker.reward.reward_type}.")
 
-        RemoteRewardManager = ray.remote(RewardManager).options(num_cpus=config.worker.reward.num_cpus)
-        reward_fn = RemoteRewardManager.remote(config.worker.reward, tokenizer)
-        val_reward_fn = RemoteRewardManager.remote(config.worker.reward, tokenizer)
+        ##################### Prev PAPO Implementation ################################
+        # if config.worker.reward.reward_type == "sequential":
+        #     RewardManager = SequentialFunctionRewardManager
+        # elif config.worker.reward.reward_type == "batch":
+        #     RewardManager = BatchFunctionRewardManager
+        # else:
+        #     raise NotImplementedError(f"Unknown reward type {config.worker.reward.reward_type}.")
 
+        # RemoteRewardManager = ray.remote(RewardManager).options(num_cpus=config.worker.reward.num_cpus)
+        # reward_fn = RemoteRewardManager.remote(config.worker.reward, tokenizer)
+        # val_reward_fn = RemoteRewardManager.remote(config.worker.reward, tokenizer)
+        reward_fn = CustomRewardManager(
+            tokenizer=tokenizer, num_examine=1, compute_score=config.worker.reward.compute_score
+        )
         train_dataloader, val_dataloader = create_dataloader(config.data, tokenizer, processor)
 
         trainer = RayPPOTrainer(
@@ -91,7 +95,7 @@ class Runner:
             resource_pool_manager=resource_pool_manager,
             ray_worker_group_cls=ray_worker_group_cls,
             reward_fn=reward_fn,
-            val_reward_fn=val_reward_fn,
+            val_reward_fn=None,
         )
         trainer.init_workers()
         trainer.fit()

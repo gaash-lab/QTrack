@@ -50,7 +50,7 @@ from .metrics import compute_data_metrics, compute_throughout_metrics, compute_t
 
 from PIL import Image
 from ..utils.dataset import collate_fn
-from .papo_utils import random_patch_blackening
+# from .papo_utils import random_patch_blackening
 
 
 class Role(IntEnum):
@@ -126,7 +126,7 @@ def apply_kl_penalty(data: DataProto, kl_ctrl: KLController, kl_penalty="kl"):
 
 def apply_kl_contrastive(
     data: DataProto,
-    kl_ctrl_contrastive: core_algos.KLController,
+    kl_ctrl_temporal: core_algos.KLController,
     kl_penalty_contrastive="kl",
     kl_prcp_apply_mode="all",
 ):
@@ -138,16 +138,16 @@ def apply_kl_contrastive(
         raise NotImplementedError("correct_only mode is not implemented yet.")
 
     #PAPO: here the actual loss is calculated for contrastive KL
-    kld_contrastive = core_algos.compute_kl(
+    kld_temporal = core_algos.compute_kl(
         data.batch["old_log_probs"], data.batch["aug_log_probs"], kl_penalty=kl_penalty_contrastive
     )
-    kld_contrastive = kld_contrastive * response_mask
-    data.batch["token_level_rewards"] += kl_ctrl_contrastive.kl_coef * kld_contrastive # PAPO: We are adding the PAPO loss to GRPO rewards to make its value high if the loss is high.
+    kld_temporal = kld_temporal * response_mask
+    data.batch["token_level_rewards"] += kl_ctrl_temporal.kl_coef * kld_temporal # PAPO: We are adding the PAPO loss to GRPO rewards to make its value high if the loss is high.
     
-    current_kl_contrastive = VF.masked_mean(kld_contrastive, mask=response_mask, dim=-1)
+    current_kl_contrastive = VF.masked_mean(kld_temporal, mask=response_mask, dim=-1)
     current_kl_contrastive = torch.mean(current_kl_contrastive, dim=0).item()
-    metrics = {"kl_contrastive/kl": current_kl_contrastive, "kl_contrastive/kl_coef": kl_ctrl_contrastive.kl_coef}
-    kl_ctrl_contrastive.update(current_kl=current_kl_contrastive, n_steps=batch_size)
+    metrics = {"kl_contrastive/kl": current_kl_contrastive, "kl_contrastive/kl_coef": kl_ctrl_temporal.kl_coef}
+    kl_ctrl_temporal.update(current_kl=current_kl_contrastive, n_steps=batch_size)
     
     # According to https://github.com/huggingface/trl/blob/v0.11.0/trl/trainer/ppo_trainer.py#L880
     return data, metrics
@@ -493,20 +493,54 @@ class RayPPOTrainer:
         )
         metrics.update(global_balance_stats)
 
-    def _aug_img_for_kl_prcp(self, original_images_pil: List[Image.Image]) -> List[Image.Image]:
+    ############################### Prev PAPO Implementation ###################################
+    # def _aug_img_for_kl_prcp(self, original_images_pil: List[Image.Image]) -> List[Image.Image]:
+    #     """
+    #     Perform augmentation on the original images for contrastive KL.
+    #     This function should be implemented based on the specific augmentation method used.
+    #     """
+    #     aug_config = self.config.algorithm.aug_config
+    #     if self.config.algorithm.contrastive_type == "augmented":
+    #         augmented_images = []
+    #         for img in original_images_pil:
+    #             aug_img = random_patch_blackening(img, **aug_config)
+    #             augmented_images.append(aug_img)
+    #         return augmented_images
+    #     else:
+    #         raise NotImplementedError(f"Unknown contrastive KL type: {self.config.algorithm.contrastive_type}.")
+
+
+    ############################ New TAPO Implementation ###################################
+    def _temporal_corruption(self, video_frames: List[List[Image.Image]]) -> List[List[Image.Image]]:
         """
-        Perform augmentation on the original images for contrastive KL.
-        This function should be implemented based on the specific augmentation method used.
+        video_frames: List of video sequences, each is [frame0, frame1, frame2 ....]
+        Returns Corrupted sequence with destroyed motion.
         """
-        aug_config = self.config.algorithm.aug_config
-        if self.config.algorithm.contrastive_type == "augmented":
-            augmented_images = []
-            for img in original_images_pil:
-                aug_img = random_patch_blackening(img, **aug_config)
-                augmented_images.append(aug_img)
-            return augmented_images
-        else:
-            raise NotImplementedError(f"Unknown contrastive KL type: {self.config.algorithm.contrastive_type}.")
+
+        corrupted_frames = []
+        for sequence in video_frames:
+            # choose corruption method
+            if self.config.algorithm.temporal_corruption_type == "freeze":
+                # Frame freeziong: all frames = first frame
+                corrupted_seq = [sequence[0]] * len(sequence)
+            elif self.config.algorithm.temporal_corruption_type == "shuffle":
+                # Frame shuffling
+                corrupted_seq = sequence.copy()
+                if len(corrupted_seq) > 1:
+                    # shuffle frame 1...T, keep frame 0 fixed
+                    fromes_to_shuffle = corrupted_seq[1:]
+                    random.shuffle(fromes_to_shuffle)
+                    corrupted_seq = [corrupted_seq[0]] + frames_to_shuffle
+
+            elif self.config.algorithm.temporal_corruption_type == "drop":
+                corrupted_seq = sequence.copy()
+                for i in range(1, len(corrupted_seq)):
+                    corrupted_seq[i] = self._create_blank_frame(corrupted_seq[i])
+            else:
+                raise NotImplementedError(f"Unknown temporal corruption type: {self.config.algorithm.temporal_corruption_type}.")
+
+            corrupted_frames.append(corrupted_seq)
+        return corrupted_frames
 
     def _get_kl_prcp_weights(self, batch: DataProto, reward_metrics: Dict[str, Any]) -> DataProto:
         if self.config.algorithm.kl_prcp_apply_mode == "all":
@@ -551,19 +585,29 @@ class RayPPOTrainer:
             }
             new_batch: DataProto = DataProto.from_single_dict(batch_dict, meta_info=meta_info)
             
-            if self.config.algorithm.use_kl_prcp and "multi_modal_data" in new_batch.non_tensor_batch.keys():
-                # take the raw PIL images
-                aug_multi_modal_data = []
-                for item in new_batch.non_tensor_batch["multi_modal_data"]:
-                    if "image_aug" in item:
-                        # use pre-augmented images (preprocessed for semantic-aware masking)
-                        aug_images_pil = item.pop('image_aug')  # a list
-                    else: # online random masking
-                        original_images_pil = item['images'] # a list
-                        aug_images_pil = self._aug_img_for_kl_prcp(original_images_pil) # PAPO: Augmentation of image is happenning here
-                    aug_multi_modal_data.append({"images": aug_images_pil})
+
+            ############################## Prev PAPO Implementation ###################################
+            # if self.config.algorithm.use_kl_prcp and "multi_modal_data" in new_batch.non_tensor_batch.keys():
+            #     # take the raw PIL images
+            #     aug_multi_modal_data = []
+            #     for item in new_batch.non_tensor_batch["multi_modal_data"]:
+            #         if "image_aug" in item:
+            #             # use pre-augmented images (preprocessed for semantic-aware masking)
+            #             aug_images_pil = item.pop('image_aug')  # a list
+            #         else: # online random masking
+            #             original_images_pil = item['images'] # a list
+            #             aug_images_pil = self._aug_img_for_kl_prcp(original_images_pil) # PAPO: Augmentation of image is happenning here
+            #         aug_multi_modal_data.append({"images": aug_images_pil})
+            #     # add to new_batch
+            #     new_batch.non_tensor_batch["aug_multi_modal_data"] = aug_multi_modal_data
+
+
+            ############################# New TAPO Implementation ###################################
+            if self.config.algorithm.use_kl_prcp and "images" in new_batch.non_tensor_batch.keys():
+                video_sequences = new_batch.non_tensor_batch["images"]  # List of video sequences, each is [frame0, frame1, frame2 ....]
+                corrupted_video_sequences = self._temporal_corruption(video_sequences) # TAPO: Temporal Corruption happens here
                 # add to new_batch
-                new_batch.non_tensor_batch["aug_multi_modal_data"] = aug_multi_modal_data
+                new_batch.non_tensor_batch["aug_multi_modal_data"] = corrupted_video_sequences
                 
             # pop those keys for generation
             gen_batch = new_batch.pop(
@@ -714,10 +758,19 @@ class RayPPOTrainer:
                     batch = batch.union(old_log_probs)
 
                 # compute aug log_probs
+                ####################### Prev PAPO Implementation ###################################
+                # if self.config.algorithm.use_kl_prcp and "aug_multi_modal_data" in batch.non_tensor_batch.keys():
+                #     # compute log_probs with augmented images
+                #     with timer("aug_probs", timing_raw):
+                #         aug_log_probs = self.actor_rollout_ref_wg.compute_log_probs_aug(batch) #PAPO: here is the impaired version prediction computed
+                #         batch = batch.union(aug_log_probs)
+
+
+                ####################### New TAPO Implementation ###################################
                 if self.config.algorithm.use_kl_prcp and "aug_multi_modal_data" in batch.non_tensor_batch.keys():
                     # compute log_probs with augmented images
                     with timer("aug_probs", timing_raw):
-                        aug_log_probs = self.actor_rollout_ref_wg.compute_log_probs_aug(batch) #PAPO: here is the impaired version prediction computed
+                        aug_log_probs = self.actor_rollout_ref_wg.compute_log_probs_aug(batch) #TAPO: here is the impaired version prediction computed
                         batch = batch.union(aug_log_probs)
 
                 # compute ref_log_probs
