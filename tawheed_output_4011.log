@@ -1,16 +1,0 @@
-no change     /apps/anaconda3/condabin/conda
-no change     /apps/anaconda3/bin/conda
-no change     /apps/anaconda3/bin/conda-env
-no change     /apps/anaconda3/bin/activate
-no change     /apps/anaconda3/bin/deactivate
-no change     /apps/anaconda3/etc/profile.d/conda.sh
-no change     /apps/anaconda3/etc/fish/conf.d/conda.fish
-no change     /apps/anaconda3/shell/condabin/Conda.psm1
-no change     /apps/anaconda3/shell/condabin/conda-hook.ps1
-no change     /apps/anaconda3/lib/python3.11/site-packages/xontrib/conda.xsh
-no change     /apps/anaconda3/etc/profile.d/conda.csh
-no change     /home/gaash/.bashrc
-No action taken.
-Using device: cuda
-Saving the dataset (0/5 shards):   0%|          | 0/9128 [00:00<?, ? examples/s]Saving the dataset (0/5 shards):  11%|█         | 1000/9128 [00:00<00:07, 1109.02 examples/s]Saving the dataset (0/5 shards):  20%|██        | 1826/9128 [00:01<00:07, 1001.93 examples/s]Saving the dataset (1/5 shards):  20%|██        | 1826/9128 [00:02<00:07, 1001.93 examples/s]Saving the dataset (1/5 shards):  31%|███       | 2826/9128 [00:03<00:07, 889.93 examples/s] Saving the dataset (1/5 shards):  40%|████      | 3652/9128 [00:03<00:05, 958.18 examples/s]Saving the dataset (2/5 shards):  40%|████      | 3652/9128 [00:04<00:05, 958.18 examples/s]Saving the dataset (2/5 shards):  51%|█████     | 4652/9128 [00:05<00:05, 886.43 examples/s]Saving the dataset (2/5 shards):  60%|██████    | 5478/9128 [00:05<00:03, 950.41 examples/s]Saving the dataset (3/5 shards):  60%|██████    | 5478/9128 [00:06<00:03, 950.41 examples/s]Saving the dataset (3/5 shards):  71%|███████   | 6478/9128 [00:07<00:02, 901.03 examples/s]Saving the dataset (3/5 shards):  80%|████████  | 7303/9128 [00:07<00:01, 956.78 examples/s]Saving the dataset (4/5 shards):  80%|████████  | 7303/9128 [00:08<00:01, 956.78 examples/s]Saving the dataset (4/5 shards):  91%|█████████ | 8303/9128 [00:08<00:00, 1114.73 examples/s]Saving the dataset (4/5 shards): 100%|██████████| 9128/9128 [00:08<00:00, 1438.51 examples/s]Saving the dataset (5/5 shards): 100%|██████████| 9128/9128 [00:08<00:00, 1438.51 examples/s]Saving the dataset (5/5 shards): 100%|██████████| 9128/9128 [00:08<00:00, 1021.79 examples/s]
-Saved HuggingFace MCP dataset to: /home/gaash/Wasif/Tawheed/MOT_grounding_Dataset/hf_dataset_mcp_new
