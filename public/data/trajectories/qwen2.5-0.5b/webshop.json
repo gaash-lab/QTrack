@@ -1,0 +1,80 @@
+{
+  "taskName": "WebShop",
+  "taskDescription": "Agent shopping for items on an e-commerce website",
+  "trajectories": {
+    "traj1": {
+      "name": "Standard Shopping",
+      "description": "Simple shopping journey to find and purchase headphones",
+      "totalSteps": 2,
+      "success": true,
+      "validActionRate": "100%",
+      "effectiveActionRate": "100%",
+      "steps": [
+        {
+          "state": {
+            "image": "/data/trajectories/qwen2.5-0.5b/webshop/traj1/step1.png",
+            "description": "You are on the homepage of WebShop. There is a search bar at the top and categories listed on the left sidebar. Your goal is to purchase wireless headphones under $50."
+          },
+          "reasoning": "I need to find wireless headphones under $50. The most direct approach is to use the search bar to look for wireless headphones, then filter by price.",
+          "action": "search('wireless headphones')"
+        },
+        {
+          "state": {
+            "image": "/data/trajectories/qwen2.5-0.5b/webshop/traj1/step2.png",
+            "description": "Search results for 'wireless headphones' are displayed. There are 24 products shown with various prices and features. You see filter options on the left sidebar including price ranges."
+          },
+          "reasoning": "Now I need to filter these results to only show headphones under $50. I'll use the price filter option.",
+          "action": "filter('price', 'under $50')"
+        }
+      ]
+    },
+    "traj2": {
+      "name": "Code-Based Shopping",
+      "description": "Shopping journey with HTML representations of the website",
+      "totalSteps": 2,
+      "success": true,
+      "validActionRate": "100%",
+      "effectiveActionRate": "100%",
+      "steps": [
+        {
+          "state": {
+            "description": "You are on the homepage of WebShop. The page structure is represented as:\n\n```html\n<!DOCTYPE html>\n<html>\n<head>\n    <title>WebShop - Online Shopping</title>\n</head>\n<body>\n    <header>\n        <div class=\"logo\">WebShop</div>\n        <div class=\"search-container\">\n            <form action=\"/search\" method=\"get\">\n                <input type=\"text\" name=\"query\" placeholder=\"Search for products...\">\n                <button type=\"submit\">Search</button>\n            </form>\n        </div>\n        <div class=\"cart-icon\">Cart (0)</div>\n    </header>\n    <main>\n        <aside class=\"categories\">\n            <h3>Categories</h3>\n            <ul>\n                <li><a href=\"/category/electronics\">Electronics</a></li>\n                <li><a href=\"/category/clothing\">Clothing</a></li>\n                <li><a href=\"/category/home\">Home & Kitchen</a></li>\n                <li><a href=\"/category/books\">Books</a></li>\n                <li><a href=\"/category/toys\">Toys & Games</a></li>\n            </ul>\n        </aside>\n        <section class=\"featured-products\">\n            <h2>Featured Products</h2>\n            <!-- Product listings would go here -->\n        </section>\n    </main>\n</body>\n</html>\n```\n\nYour goal is to purchase wireless headphones under $50."
+          },
+          "reasoning": "Looking at the HTML structure, I can see that there's a search form at the top of the page with an input field named 'query'. I should use this to search for wireless headphones.",
+          "action": "search('wireless headphones')"
+        },
+        {
+          "state": {
+            "description": "Search results page for 'wireless headphones' is displayed. The structure is:\n\n```html\n<!DOCTYPE html>\n<html>\n<head>\n    <title>Search Results: wireless headphones - WebShop</title>\n</head>\n<body>\n    <header><!-- Same header as before --></header>\n    <main>\n        <aside class=\"filters\">\n            <h3>Filter By</h3>\n            <div class=\"filter-section\">\n                <h4>Price</h4>\n                <ul>\n                    <li><a href=\"/search?query=wireless+headphones&price=under25\">Under $25</a></li>\n                    <li><a href=\"/search?query=wireless+headphones&price=25to50\">$25 to $50</a></li>\n                    <li><a href=\"/search?query=wireless+headphones&price=50to100\">$50 to $100</a></li>\n                    <li><a href=\"/search?query=wireless+headphones&price=100plus\">$100 & Above</a></li>\n                </ul>\n            </div>\n            <div class=\"filter-section\">\n                <h4>Brand</h4>\n                <ul>\n                    <li><a href=\"/search?query=wireless+headphones&brand=sony\">Sony</a></li>\n                    <li><a href=\"/search?query=wireless+headphones&brand=bose\">Bose</a></li>\n                    <li><a href=\"/search?query=wireless+headphones&brand=jabra\">Jabra</a></li>\n                    <li><a href=\"/search?query=wireless+headphones&brand=jbl\">JBL</a></li>\n                </ul>\n            </div>\n        </aside>\n        <section class=\"search-results\">\n            <h2>Results for \"wireless headphones\" (24 items)</h2>\n            <div class=\"product-grid\">\n                <!-- Product listings would go here -->\n            </div>\n        </section>\n    </main>\n</body>\n</html>\n```\n\nYou need to filter the results to find headphones under $50."
+          },
+          "reasoning": "Based on the HTML structure, I can see the price filter options in the sidebar. There's a link for '$25 to $50' which will help me filter for headphones under $50. I should click on that link.",
+          "action": "click('/search?query=wireless+headphones&price=25to50')"
+        }
+      ]
+    },
+    "traj3": {
+      "name": "JavaScript API Shopping",
+      "description": "Shopping with JavaScript API representation",
+      "totalSteps": 2,
+      "success": true,
+      "validActionRate": "100%",
+      "effectiveActionRate": "100%",
+      "steps": [
+        {
+          "state": {
+            "description": "You are on the homepage of WebShop. The API interaction model is represented as:\n\n```javascript\n// WebShop API client interface\nclass WebShopClient {\n  constructor() {\n    this.currentPage = 'home';\n    this.cart = [];\n    this.searchResults = null;\n  }\n  \n  // Search for products\n  async search(query) {\n    console.log(`Searching for: ${query}`);\n    // This would make an API call in a real implementation\n    this.searchResults = await fetchFromAPI(`/api/search?q=${encodeURIComponent(query)}`);\n    this.currentPage = 'search_results';\n    return this.searchResults;\n  }\n  \n  // Apply filters to search results\n  async applyFilter(filterType, filterValue) {\n    if (!this.searchResults) {\n      throw new Error('Must perform search before applying filters');\n    }\n    console.log(`Applying filter: ${filterType}=${filterValue}`);\n    // This would make an API call in a real implementation\n    this.searchResults = await fetchFromAPI(\n      `/api/search?q=${encodeURIComponent(this.searchResults.query)}&${filterType}=${encodeURIComponent(filterValue)}`\n    );\n    return this.searchResults;\n  }\n  \n  // Add product to cart\n  addToCart(productId, quantity = 1) {\n    console.log(`Adding product ${productId} to cart (qty: ${quantity})`);\n    // This would make an API call in a real implementation\n    this.cart.push({ productId, quantity });\n    return this.cart;\n  }\n}\n\n// Initialize client\nconst client = new WebShopClient();\n```\n\nYour goal is to purchase wireless headphones under $50."
+          },
+          "reasoning": "Looking at the JavaScript API client, I need to use the `search` method to look for wireless headphones. According to the code, this will update the `currentPage` to 'search_results' and populate the `searchResults` property.",
+          "action": "client.search('wireless headphones')"
+        },
+        {
+          "state": {
+            "description": "Search completed. The client state is now:\n\n```javascript\n// Client state after search\nconsole.log(client);\n/* Output:\nWebShopClient {\n  currentPage: 'search_results',\n  cart: [],\n  searchResults: {\n    query: 'wireless headphones',\n    totalResults: 24,\n    filters: [\n      { type: 'price', options: ['under25', '25to50', '50to100', '100plus'] },\n      { type: 'brand', options: ['sony', 'bose', 'jabra', 'jbl'] }\n    ],\n    products: [\n      /* Array of 24 product objects */\n    ]\n  }\n}\n*/\n\n// Available price filters\nconsole.log(client.searchResults.filters.find(f => f.type === 'price'));\n/* Output:\n{ \n  type: 'price', \n  options: ['under25', '25to50', '50to100', '100plus'] \n}\n*/\n```\n\nYou need to filter the results to find headphones under $50."
+          },
+          "reasoning": "Now I need to apply a price filter to show only headphones under $50. Looking at the available price filters, I can see options 'under25' and '25to50'. Since I want headphones under $50, I should use the applyFilter method with 'price' as the filterType and '25to50' as the filterValue to see headphones in the $25-$50 range.",
+          "action": "client.applyFilter('price', '25to50')"
+        }
+      ]
+    }
+  }
+} 

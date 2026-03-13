@@ -1,0 +1,278 @@
+/* Hero Section styles */
+/* .cta-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 24px;
+    background: linear-gradient(45deg, #2a2f6c, #4b4f8f);
+    border: none;
+    border-radius: 50px;
+    color: white;
+    font-size: 18px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(42, 47, 108, 0.2);
+  }
+
+  .cta-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(42, 47, 108, 0.3);
+    text-decoration: none;
+  }
+
+  .button-icon {
+    width: 24px;
+    height: 24px;
+    fill: currentColor;
+  }
+
+  .button-text {
+    margin-right: 12px;
+  }
+
+  .repo-stats {
+    display: flex;
+    gap: 16px;
+    padding-left: 16px;
+    border-left: 1px solid rgba(255, 255, 255, 0.3);
+  }
+
+  .stat-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: white;
+    font-size: 16px;
+  }
+
+  .stat-item svg {
+    fill: currentColor;
+  }
+
+  .vagen-announcement {
+    color: #2a2f6c;
+    font-size: 0.9em;
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+
+  .vagen-announcement:hover {
+    color: #4b4f8f;
+    text-decoration: none;
+  }
+ */
+
+/* Character reveal animation */
+
+.reveal-char {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: revealUp 0.6s ease forwards;
+}
+
+@keyframes revealUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Title Animation */
+.reveal-char-title {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(30px);
+  animation: revealTitle 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes revealTitle {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+.hero-section {
+  max-width: 1000px;
+  margin: 4rem auto;
+  padding: 1rem;
+  text-align: center;
+  padding-top: 2rem;
+  padding-bottom: 4rem;
+}
+
+.title-wrapper { 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  gap: 1rem; 
+  margin-bottom: 0.5rem; 
+}
+
+.title-icon { 
+  height: 60px; 
+  width: auto; 
+  flex-shrink: 0; 
+}
+
+.main-title { 
+  font-size: 3.75rem; 
+  font-weight: 800; 
+  color: #2a2f6c; 
+  min-height: 1.2em; 
+  flex-shrink: 0; 
+}
+
+.subtitle { 
+  font-size: 2.75rem; 
+  font-weight: 700; 
+  color: #333; 
+  margin-bottom: 1rem; 
+}
+
+.description { 
+  font-size: 1.5rem; 
+  color: #555; 
+  margin-bottom: 2rem; 
+  line-height: 1.6; 
+}
+
+/* .cta-button { 
+  display: inline-flex; 
+  align-items: center; 
+  gap: 0.6em; 
+  background-color: #2d333a; 
+  padding: 0.9rem 1.6rem; 
+  border-radius: 30px; 
+  text-decoration: none; 
+  border: none; 
+  box-shadow: none; 
+  cursor: pointer; 
+  transition: background-color 0.2s ease, transform 0.2s ease; 
+}
+.cta-button:hover { 
+  background-color: #444; 
+  transform: translateY(-2px); 
+  box-shadow: none; 
+} */
+
+.cta-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 18px;
+  padding: 14px 30px;
+  border-radius: 50px;
+
+  /* Dark Blue Gradient */
+  background: linear-gradient(135deg, #2f3ea8, #1e2a78);
+
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.25s ease;
+  box-shadow: 0 10px 25px rgba(0, 0, 60, 0.25);
+}
+
+.cta-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 30px rgba(0, 0, 60, 0.35);
+}
+
+.button-icon { 
+  height: 1.4em; 
+  width: auto; 
+  fill: white; 
+}
+
+.button-text { 
+  background: white; 
+  -webkit-background-clip: text; 
+  background-clip: text; 
+  color: transparent; 
+  -webkit-text-fill-color: transparent; 
+  font-size: 1.1rem; 
+  font-weight: 600; 
+  display: inline-block; 
+}
+
+.cta-button:hover { 
+  background-color: #444; 
+  transform: translateY(-2px); 
+  box-shadow: none; 
+}
+
+.diagram-placeholder { 
+  margin-top: 3rem; 
+  
+}
+
+
+.repo-stats {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border-left: 1px solid rgba(255, 255, 255, 0.4);
+  padding-left: 16px;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  color: #dfe3ff;
+}
+
+.button-text {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: white;
+}
+
+/* Authors section in Hero component */
+.authors-section {
+  margin-top: 3rem;
+  background-color: #f8f9fa;
+  padding: 2rem;
+  border-radius: 8px;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.hero-section .authors-list {
+  margin-bottom: 0;
+}
+
+.hero-section .equal-contribution {
+  font-size: 0.95rem;
+  color: #6c757d;
+  margin-top: 1rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .title-wrapper {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .main-title {
+    font-size: 3rem;
+  }
+  
+  .subtitle {
+    font-size: 2rem;
+  }
+  
+  .description {
+    font-size: 1.25rem;
+  }
+  
+  .resources-buttons {
+    flex-direction: column;
+  }
+} 

@@ -1,0 +1,69 @@
+/* General Content Section styles */
+.content-section {
+  padding: 4rem 1rem;
+  /* scroll-margin-top ensures section starts below the sticky header */
+  scroll-margin-top: calc(var(--header-height, 60px) + 1rem);
+}
+
+/* Ensure hero section also respects scroll margin if needed */
+#hero {
+  scroll-margin-top: 1rem; /* Hero is at the top, maybe less margin needed or none */
+}
+
+.section-container {
+  max-width: var(--page-max-width, 1100px);
+  margin: 0 auto;
+  text-align: left;
+}
+
+.content-section.hero-section {
+  /* Override text-align for hero */
+  text-align: center;
+}
+
+.section-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #2a2f6c;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.section-description {
+  font-size: 1.1rem;
+  color: #555;
+  line-height: 1.7;
+  margin-bottom: 2rem;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
+.placeholder-box {
+  background-color: #e9ecef;
+  border: 1px dashed #ced4da;
+  padding: 3rem 1rem;
+  text-align: center;
+  color: #6c757d;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  font-size: 1rem;
+}
+
+.findings-list {
+  list-style: disc;
+  margin-left: 2rem;
+  margin-bottom: 2rem;
+  font-size: 1.05rem;
+  color: #444;
+  line-height: 1.8;
+}
+
+.findings-list li {
+  margin-bottom: 0.8rem;
+}
+
+.content-section.alt-background {
+  background-color: #ffffff; /* White background for alternating sections */
+} 

@@ -1,0 +1,362 @@
+/* =========================
+   ROOT VARIABLES
+========================= */
+:root {
+  --header-height: 60px;
+  --page-max-width: 1100px;
+
+  --color-bg: #ffffff;
+  --color-border: #e6e8ec;
+  --color-text: #2b2f36;
+  --color-muted: #6b7280;
+  --color-primary: #2a2f6c;
+  --color-hover: #f5f7fa;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --transition: all 0.2s ease;
+}
+
+/* =========================
+   HEADER
+========================= */
+header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+
+  height: var(--header-height);
+  background: var(--color-bg);
+  border-bottom: 1px solid var(--color-border);
+
+  display: flex;
+  align-items: center;
+}
+
+/* =========================
+   CONTAINER
+========================= */
+.container {
+  max-width: var(--page-max-width,1100px);
+  margin: 0 auto;
+  padding: 0 1rem;
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* =========================
+   LOGO BADGE (Left)
+========================= */
+.info-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 6px 14px;
+  border-radius: 999px;
+
+  background: #fff;
+  border: 1px solid var(--color-border);
+
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--color-text);
+
+  transition: var(--transition);
+}
+
+.info-badge:hover {
+  background: var(--color-hover);
+  border-color: #d0d5dd;
+}
+
+.badge-icon {
+  height: 22px;
+  width: auto;
+  flex-shrink: 0;
+}
+
+.badge-text {
+  white-space: nowrap;
+}
+
+/* =========================
+   NAVIGATION
+========================= */
+.nav-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+}
+
+.main-nav ul {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 1.4rem;
+
+  margin: 0;
+  padding: 0;
+}
+
+.main-nav li {
+  position: relative;
+}
+
+.main-nav a {
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--color-muted);
+
+  display: flex;
+  align-items: center;
+  gap: 5px;
+
+  transition: var(--transition);
+}
+
+.main-nav a:hover {
+  color: var(--color-primary);
+}
+
+
+/* =========================
+   DROPDOWN (CLEAN VERSION)
+========================= */
+
+.dropdown {
+  position: relative;
+}
+
+.dropdown-toggle {
+  cursor: pointer;
+}
+
+.dropdown-icon {
+  width: 12px;
+  height: 12px;
+  transition: transform 0.2s ease;
+}
+
+.dropdown:hover .dropdown-icon {
+  transform: rotate(180deg);
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 110%;
+  left: 0;
+
+  min-width: 190px;
+  padding: 6px 0;
+
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px);
+  transition: all 0.18s ease;
+}
+
+.dropdown:hover .dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.dropdown-menu a {
+  display: block;
+  padding: 8px 14px;
+
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #4b5563;
+  text-decoration: none;
+  white-space: nowrap;
+
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.dropdown-menu a:hover {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+
+/* =========================
+   DROPDOWN
+/* ========================= */
+/* 
+.dropdown-toggle {
+  cursor: pointer;
+}
+
+.dropdown-icon {
+  width: 12px;
+  height: 12px;
+  transition: transform 0.2s ease;
+}
+
+.dropdown:hover .dropdown-icon {
+  transform: rotate(180deg);
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%) translateY(-8px);
+
+  min-width: 170px;
+  padding: 8px 0;
+
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+
+  opacity: 0;
+  visibility: hidden;
+  transition: var(--transition);
+}
+
+.dropdown:hover .dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+.dropdown-item {
+  display: block;
+  padding: 9px 16px;
+
+  font-size: 0.9rem;
+  color: var(--color-muted);
+  text-decoration: none;
+
+  transition: var(--transition);
+}
+
+.dropdown-item:hover {
+  background: var(--color-hover);
+  color: var(--color-primary);
+}  */
+
+/* =========================
+   GITHUB LINK
+========================= */
+.github-repo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  padding: 6px 8px;
+  border-radius: var(--radius-sm);
+
+  color: var(--color-muted);
+  text-decoration: none;
+  font-weight: 500;
+
+  transition: var(--transition);
+}
+
+.github-repo:hover {
+  background: var(--color-hover);
+  color: var(--color-primary);
+}
+
+.repo-icon svg {
+  height: 20px;
+  width: 20px;
+  fill: currentColor;
+}
+
+/* =========================
+   MOBILE
+========================= */
+@media (max-width: 768px) {
+
+  .container {
+    padding: 0 0.8rem;
+  }
+
+  .main-nav ul {
+    gap: 1.8rem;
+  }
+
+  .main-nav a {
+    font-size: 0.85rem;
+  }
+
+  .info-badge {
+    padding: 6px 16px;
+    font-size: 0.85rem;
+    border-radius: 999px;
+  font-weight: 600;
+  }
+
+  .badge-icon {
+    height: 18px;
+  }
+
+  /* .dropdown-menu {
+    left: auto;
+    right: 0;
+    transform: translateY(-8px);
+  } */
+
+  /* .dropdown-menu {
+  position: absolute;
+  top: 110%;
+  left: 0;
+
+  min-width: 200px;
+  padding: 6px 0;
+
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px);
+  transition: all 0.18s ease;
+}
+
+  .dropdown:hover .dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+} */
+}
+
+/* =========================
+   VERY SMALL SCREENS
+========================= */
+@media (max-width: 480px) {
+
+  .badge-text {
+    display: none;
+  }
+
+  .info-badge {
+    padding: 6px;
+  }
+
+  .main-nav ul {
+    gap: 0.6rem;
+  }
+
+  .main-nav a {
+    font-size: 0.8rem;
+  }
+}

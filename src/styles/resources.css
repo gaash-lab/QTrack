@@ -1,0 +1,56 @@
+/* Resources section styles */
+.resources-section {
+  margin-top: 3rem;
+}
+
+.resources-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #2a2f6c;
+  margin-bottom: 1.2rem;
+}
+
+.resources-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  margin: 0 auto;
+  max-width: 800px;
+}
+
+.resource-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: white;
+  color: #2a2f6c;
+  padding: 0.8rem 1.4rem;
+  border-radius: 30px;
+  text-decoration: none;
+  border: 1px solid #e0e0e0;
+  font-weight: 500;
+  font-size: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+.resource-button:hover {
+  background-color: #f5f7ff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.resource-icon {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+  stroke-width: 2;
+  fill: none;
+}
+
+.resource-icon.x-icon {
+  stroke: none;
+  fill: currentColor;
+  stroke-width: 0;
+} 

@@ -1,0 +1,77 @@
+ .findings-components {
+    margin-bottom: 3rem;
+  }
+
+  .finding-card {
+    background-color: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    margin-bottom: 1.5rem;
+    transition: all 0.3s ease;
+  }
+
+  .finding-card:hover {
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    transform: translateY(-5px);
+  }
+
+  .finding-header {
+    padding: 1.2rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    color: white;
+  }
+
+  /* Different background colors for each finding card */
+  .finding-card:nth-child(1) .finding-header { background-color: #2a2f6c; }
+  .finding-card:nth-child(2) .finding-header { background-color: #4a3f9f; }
+  .finding-card:nth-child(3) .finding-header { background-color: #5e56b2; }
+  .finding-card:nth-child(4) .finding-header { background-color: #7165d8; }
+  .finding-card:nth-child(5) .finding-header { background-color: #9f7cd2; }
+  .finding-card:nth-child(6) .finding-header { background-color: #2a2f6c; }
+
+  .finding-title {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    flex: 1;
+  }
+
+  .expand-icon {
+    font-size: 1.5rem;
+    font-weight: bold;
+    transition: transform 0.3s ease;
+    margin-left: 1rem;
+  }
+
+  .finding-content {
+    padding: 1.5rem;
+    display: none;
+    line-height: 1.7;
+  }
+
+  .finding-content p {
+    margin: 0;
+    font-size: 1.1rem;
+  }
+
+  .finding-content.active {
+    display: block;
+    animation: fadeIn 0.5s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Add highlighting for key terms */
+  .finding-content strong {
+    color: #4a3f9f;
+    background-color: rgba(74, 63, 159, 0.1);
+    padding: 0.1rem 0.3rem;
+    border-radius: 3px;
+  }

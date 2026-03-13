@@ -1,0 +1,86 @@
+{
+  "taskName": "Code Examples",
+  "taskDescription": "Examples of various code formats for testing code block rendering",
+  "trajectories": {
+    "traj1": {
+      "name": "Python Examples",
+      "description": "Python code block examples with and without language specifier",
+      "totalSteps": 3,
+      "success": true,
+      "validActionRate": "N/A",
+      "effectiveActionRate": "N/A",
+      "steps": [
+        {
+          "state": {
+            "description": "Example with Python language specifier:\n\n```python\ndef fibonacci(n):\n    a, b = 0, 1\n    for _ in range(n):\n        a, b = b, a + b\n    return a\n\n# Calculate the 10th Fibonacci number\nresult = fibonacci(10)\nprint(f\"The 10th Fibonacci number is {result}\")\n```\n\nThis function efficiently calculates Fibonacci numbers using iteration."
+          }
+        },
+        {
+          "state": {
+            "description": "Example without language specifier:\n\n```\n# Python example without language tag\nclass BinarySearchTree:\n    def __init__(self, value):\n        self.value = value\n        self.left = None\n        self.right = None\n        \n    def insert(self, value):\n        if value < self.value:\n            if self.left is None:\n                self.left = BinarySearchTree(value)\n            else:\n                self.left.insert(value)\n        else:\n            if self.right is None:\n                self.right = BinarySearchTree(value)\n            else:\n                self.right.insert(value)\n```\n\nA basic implementation of a binary search tree data structure."
+          }
+        },
+        {
+          "state": {
+            "description": "Example with regular text mixed with code blocks:\n\nThe following snippet shows how to implement a simple sorting algorithm:\n\n```python\ndef bubble_sort(arr):\n    n = len(arr)\n    for i in range(n):\n        for j in range(0, n - i - 1):\n            if arr[j] > arr[j + 1]:\n                arr[j], arr[j + 1] = arr[j + 1], arr[j]\n    return arr\n```\n\nAnd here's another example that demonstrates list comprehension:\n\n```python\n# Using list comprehension to create a list of squares\nsquares = [x**2 for x in range(10)]\nprint(squares)  # [0, 1, 4, 9, 16, 25, 36, 49, 64, 81]\n```"
+          }
+        }
+      ]
+    },
+    "traj2": {
+      "name": "Multi-Language Examples",
+      "description": "Examples of various programming languages with proper language specifiers",
+      "totalSteps": 4,
+      "success": true,
+      "validActionRate": "N/A",
+      "effectiveActionRate": "N/A",
+      "steps": [
+        {
+          "state": {
+            "description": "JavaScript Example:\n\n```javascript\n// Define a simple React component\nfunction Welcome(props) {\n  return <h1>Hello, {props.name}</h1>;\n}\n\n// Use arrow functions for event handlers\nconst handleClick = () => {\n  console.log('Button was clicked!');\n  setState({ clicked: true });\n};\n\n// Using async/await for API calls\nasync function fetchUserData(userId) {\n  try {\n    const response = await fetch(`https://api.example.com/users/${userId}`);\n    const data = await response.json();\n    return data;\n  } catch (error) {\n    console.error('Error fetching user data:', error);\n  }\n}\n```"
+          }
+        },
+        {
+          "state": {
+            "description": "Rust Example:\n\n```rust\n// A simple struct for a 2D point\n#[derive(Debug)]\nstruct Point {\n    x: f64,\n    y: f64,\n}\n\n// Implement methods for Point\nimpl Point {\n    // Constructor\n    fn new(x: f64, y: f64) -> Self {\n        Point { x, y }\n    }\n    \n    // Calculate distance from origin\n    fn distance_from_origin(&self) -> f64 {\n        (self.x.powi(2) + self.y.powi(2)).sqrt()\n    }\n}\n\nfn main() {\n    let p = Point::new(3.0, 4.0);\n    println!(\"Point: {:?}\", p);\n    println!(\"Distance from origin: {}\", p.distance_from_origin());\n}\n```"
+          }
+        },
+        {
+          "state": {
+            "description": "HTML/CSS Example:\n\n```html\n<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Sample Page</title>\n    <style>\n        .container {\n            max-width: 1200px;\n            margin: 0 auto;\n            padding: 20px;\n            font-family: Arial, sans-serif;\n        }\n        .card {\n            border: 1px solid #ddd;\n            border-radius: 8px;\n            padding: 16px;\n            margin-bottom: 16px;\n            box-shadow: 0 2px 4px rgba(0,0,0,0.1);\n        }\n    </style>\n</head>\n<body>\n    <div class=\"container\">\n        <h1>Welcome to My Page</h1>\n        <div class=\"card\">\n            <h2>Card Title</h2>\n            <p>This is some sample content in a card element.</p>\n        </div>\n    </div>\n</body>\n</html>\n```"
+          }
+        },
+        {
+          "state": {
+            "description": "SQL Example:\n\n```sql\n-- Create a users table\nCREATE TABLE users (\n    id SERIAL PRIMARY KEY,\n    username VARCHAR(50) UNIQUE NOT NULL,\n    email VARCHAR(100) UNIQUE NOT NULL,\n    password_hash VARCHAR(100) NOT NULL,\n    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n    is_active BOOLEAN DEFAULT TRUE\n);\n\n-- Create a posts table with foreign key\nCREATE TABLE posts (\n    id SERIAL PRIMARY KEY,\n    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,\n    title VARCHAR(200) NOT NULL,\n    content TEXT,\n    published_at TIMESTAMP,\n    is_published BOOLEAN DEFAULT FALSE\n);\n\n-- Complex query with joins and filters\nSELECT \n    u.username,\n    p.title,\n    p.published_at\nFROM \n    users u\nJOIN \n    posts p ON u.id = p.user_id\nWHERE \n    p.is_published = TRUE\n    AND u.is_active = TRUE\nORDER BY \n    p.published_at DESC\nLIMIT 10;\n```"
+          }
+        }
+      ]
+    },
+    "traj3": {
+      "name": "Special Code Types",
+      "description": "Examples of JSON, YAML, and terminal commands",
+      "totalSteps": 3,
+      "success": true,
+      "validActionRate": "N/A",
+      "effectiveActionRate": "N/A",
+      "steps": [
+        {
+          "state": {
+            "description": "JSON Configuration Example:\n\n```json\n{\n  \"name\": \"my-project\",\n  \"version\": \"1.0.0\",\n  \"description\": \"A demonstration project\",\n  \"main\": \"index.js\",\n  \"scripts\": {\n    \"start\": \"node index.js\",\n    \"dev\": \"nodemon index.js\",\n    \"test\": \"jest\"\n  },\n  \"dependencies\": {\n    \"express\": \"^4.17.1\",\n    \"mongoose\": \"^6.0.12\",\n    \"dotenv\": \"^10.0.0\"\n  },\n  \"devDependencies\": {\n    \"nodemon\": \"^2.0.14\",\n    \"jest\": \"^27.3.1\"\n  },\n  \"engines\": {\n    \"node\": \">=14.0.0\"\n  },\n  \"license\": \"MIT\"\n}\n```"
+          }
+        },
+        {
+          "state": {
+            "description": "YAML Configuration Example:\n\n```yaml\n# Docker Compose file for development environment\nversion: '3'\n\nservices:\n  web:\n    build: .\n    ports:\n      - \"3000:3000\"\n    volumes:\n      - .:/app\n      - /app/node_modules\n    environment:\n      - NODE_ENV=development\n      - DATABASE_URL=mongodb://db:27017/myapp\n    depends_on:\n      - db\n  \n  db:\n    image: mongo:4.4\n    ports:\n      - \"27017:27017\"\n    volumes:\n      - mongodb_data:/data/db\n\nvolumes:\n  mongodb_data:\n```"
+          }
+        },
+        {
+          "state": {
+            "description": "Terminal Commands Example:\n\n```bash\n# Update system packages\nsudo apt update && sudo apt upgrade -y\n\n# Clone a repository and navigate into it\ngit clone https://github.com/example/repo.git\ncd repo\n\n# Install dependencies and run the project\nnpm install\nnpm run build\nnpm start\n\n# Create and activate a Python virtual environment\npython -m venv venv\nsource venv/bin/activate  # On Windows: venv\\Scripts\\activate\npip install -r requirements.txt\n```"
+          }
+        }
+      ]
+    }
+  }
+} 

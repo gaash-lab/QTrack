@@ -1,0 +1,80 @@
+{
+  "taskName": "ALFWorld Navigation",
+  "taskDescription": "Agent navigating in a virtual household environment to complete tasks",
+  "trajectories": {
+    "traj1": {
+      "name": "Standard Navigation",
+      "description": "Standard navigation in a virtual household",
+      "totalSteps": 2,
+      "success": true,
+      "validActionRate": "100%",
+      "effectiveActionRate": "100%",
+      "steps": [
+        {
+          "state": {
+            "image": "/data/trajectories/qwen2.5-0.5b/alfworld/traj1/step1.png",
+            "description": "You are in the kitchen. You see a refrigerator, a microwave, and a counter with some items on it. Your task is to find a tomato and place it on the counter."
+          },
+          "reasoning": "I need to find a tomato and place it on the counter. I should first look at what items are visible, then check the refrigerator since tomatoes are often stored there.",
+          "action": "look_at('counter')"
+        },
+        {
+          "state": {
+            "image": "/data/trajectories/qwen2.5-0.5b/alfworld/traj1/step2.png",
+            "description": "You look at the counter. You see an apple, a knife, and a cutting board. The tomato is not on the counter."
+          },
+          "reasoning": "The tomato is not on the counter. I should check the refrigerator next, as that's where tomatoes are commonly stored.",
+          "action": "open('refrigerator')"
+        }
+      ]
+    },
+    "traj2": {
+      "name": "Code Visualization",
+      "description": "Enhanced trajectory with code representation of the environment",
+      "totalSteps": 2,
+      "success": true,
+      "validActionRate": "100%",
+      "effectiveActionRate": "100%",
+      "steps": [
+        {
+          "state": {
+            "description": "You are in the kitchen. The environment state is represented as follows:\n\n```python\nclass Kitchen:\n    def __init__(self):\n        self.objects = {\n            'refrigerator': {'state': 'closed', 'contains': ['milk', 'cheese', 'tomato', 'lettuce']},\n            'counter': {'state': 'clear', 'contains': ['apple', 'knife', 'cutting_board']},\n            'microwave': {'state': 'closed', 'contains': []},\n            'sink': {'state': 'empty', 'contains': []}\n        }\n        self.agent_location = 'center_of_room'\n\n# Current state representation        \nkitchen = Kitchen()\nprint(f\"Agent location: {kitchen.agent_location}\")\nprint(f\"Available objects: {list(kitchen.objects.keys())}\")\n```\n\nYour task is to find a tomato and place it on the counter."
+          },
+          "reasoning": "Looking at the environment state, I can see that the tomato is inside the refrigerator, which is currently closed. I need to open the refrigerator to access the tomato, then take it and place it on the counter.",
+          "action": "open('refrigerator')"
+        },
+        {
+          "state": {
+            "description": "You open the refrigerator. The updated environment state is:\n\n```python\n# Updated kitchen state after opening refrigerator\nkitchen.objects['refrigerator']['state'] = 'open'\n\nprint(\"Refrigerator contents:\")\nfor item in kitchen.objects['refrigerator']['contains']:\n    print(f\" - {item}\")\n\n# Output:\n# Refrigerator contents:\n# - milk\n# - cheese\n# - tomato\n# - lettuce\n```\n\nYou can now see the contents of the refrigerator, which includes a tomato."
+          },
+          "reasoning": "Now that I can see inside the refrigerator, I can confirm that there is a tomato. I need to take the tomato and then place it on the counter.",
+          "action": "take('tomato')"
+        }
+      ]
+    },
+    "traj3": {
+      "name": "Environment Mapping",
+      "description": "Navigation with JSON environment state representation",
+      "totalSteps": 2,
+      "success": true,
+      "validActionRate": "100%",
+      "effectiveActionRate": "100%",
+      "steps": [
+        {
+          "state": {
+            "description": "You are in the kitchen. The current environment state is represented as a JSON object:\n\n```json\n{\n  \"room\": \"kitchen\",\n  \"agent\": {\n    \"location\": \"center_of_room\",\n    \"inventory\": []\n  },\n  \"objects\": {\n    \"refrigerator\": {\n      \"state\": \"closed\",\n      \"location\": \"north_wall\",\n      \"contents\": [\"milk\", \"cheese\", \"tomato\", \"lettuce\"]\n    },\n    \"counter\": {\n      \"state\": \"clear\",\n      \"location\": \"east_wall\",\n      \"contents\": [\"apple\", \"knife\", \"cutting_board\"]\n    },\n    \"microwave\": {\n      \"state\": \"closed\",\n      \"location\": \"north_wall\",\n      \"contents\": []\n    },\n    \"sink\": {\n      \"state\": \"empty\",\n      \"location\": \"east_wall\",\n      \"contents\": []\n    }\n  }\n}\n```\n\nYour task is to find a tomato and place it on the counter."
+          },
+          "reasoning": "According to the JSON representation, the tomato is inside the refrigerator, which is currently closed. I need to first open the refrigerator to access the tomato.",
+          "action": "open('refrigerator')"
+        },
+        {
+          "state": {
+            "description": "You open the refrigerator. The updated environment state is:\n\n```json\n{\n  \"room\": \"kitchen\",\n  \"agent\": {\n    \"location\": \"in_front_of_refrigerator\",\n    \"inventory\": []\n  },\n  \"objects\": {\n    \"refrigerator\": {\n      \"state\": \"open\",\n      \"location\": \"north_wall\",\n      \"contents\": [\"milk\", \"cheese\", \"tomato\", \"lettuce\"],\n      \"visible_contents\": true\n    },\n    \"counter\": {\n      \"state\": \"clear\",\n      \"location\": \"east_wall\",\n      \"contents\": [\"apple\", \"knife\", \"cutting_board\"]\n    },\n    \"microwave\": {\n      \"state\": \"closed\",\n      \"location\": \"north_wall\",\n      \"contents\": []\n    },\n    \"sink\": {\n      \"state\": \"empty\",\n      \"location\": \"east_wall\",\n      \"contents\": []\n    }\n  },\n  \"accessible_objects\": [\"refrigerator\", \"milk\", \"cheese\", \"tomato\", \"lettuce\"]\n}\n```\n\nYou can now see and access the contents of the refrigerator, including the tomato."
+          },
+          "reasoning": "Now I can see that the tomato is accessible from the refrigerator. I need to take the tomato from the refrigerator.",
+          "action": "take('tomato')"
+        }
+      ]
+    }
+  }
+} 

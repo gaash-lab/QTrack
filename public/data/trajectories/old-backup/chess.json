@@ -1,0 +1,98 @@
+{
+  "taskName": "Chess Game",
+  "taskDescription": "LLM agent playing chess against a standard opponent",
+  "trajectories": {
+    "traj1": {
+      "name": "Opening Strategy 1",
+      "description": "This trajectory shows an agent executing a standard opening strategy with proper piece development.",
+      "totalSteps": 5,
+      "success": true,
+      "reasoningScore": "8.7/10",
+      "completionTime": "14.3s",
+      "steps": [
+        {
+          "state": {
+            "image": "/data/trajectories/images/chess/initial.png",
+            "description": "Initial chess position with all pieces in their starting positions."
+          },
+          "reasoning": "This is the initial state of the chess game. I need to make a strong opening move that controls the center of the board.",
+          "action": "move_pawn('e2', 'e4')"
+        },
+        {
+          "state": {
+            "image": "/data/trajectories/images/chess/after_e4_e5.png",
+            "description": "Board after e4. Opponent responded with e5."
+          },
+          "reasoning": "Opponent mirrored my move with e5. I should develop a piece, particularly a knight to attack the center.",
+          "action": "move_knight('g1', 'f3')"
+        },
+        {
+          "state": {
+            "image": "/data/trajectories/images/chess/after_nf3_nc6.png",
+            "description": "Knight developed to f3. Opponent moved knight to c6."
+          },
+          "reasoning": "Opponent developed their knight to c6. I should continue development with either bishop to c4 or another pawn move.",
+          "action": "move_bishop('f1', 'c4')"
+        },
+        {
+          "state": {
+            "image": "/data/trajectories/images/chess/after_bc4_nf6.png",
+            "description": "Bishop developed to c4. Opponent moved knight to f6."
+          },
+          "reasoning": "Opponent developed their other knight. I can either castle for safety or look for tactical opportunities.",
+          "action": "castle_kingside()"
+        },
+        {
+          "state": {
+            "image": "/data/trajectories/images/chess/after_castle_castle.png",
+            "description": "Kingside castling complete. Opponent castled kingside as well."
+          },
+          "reasoning": "Both sides have castled. Now I should look to control more space in the center and prepare for a potential attack.",
+          "action": "move_pawn('d2', 'd4')"
+        }
+      ]
+    },
+    "traj2": {
+      "name": "Queen's Gambit",
+      "description": "In this trajectory, the agent plays the Queen's Gambit opening, offering a pawn sacrifice for positional advantages.",
+      "totalSteps": 4,
+      "success": true,
+      "reasoningScore": "9.1/10",
+      "completionTime": "12.7s",
+      "steps": [
+        {
+          "state": {
+            "image": "/data/trajectories/images/chess/initial.png",
+            "description": "Initial chess position with all pieces in their starting positions."
+          },
+          "reasoning": "For this game, I'll play the Queen's Gambit opening which starts with d4 to control the center.",
+          "action": "move_pawn('d2', 'd4')"
+        },
+        {
+          "state": {
+            "image": "/data/trajectories/images/chess/after_d4_d5.png",
+            "description": "Board after d4. Opponent responded with d5."
+          },
+          "reasoning": "Opponent has played d5, matching my center control. Now I'll offer the c-pawn as in the Queen's Gambit.",
+          "action": "move_pawn('c2', 'c4')"
+        },
+        {
+          "state": {
+            "image": "/data/trajectories/images/chess/after_c4_dxc4.png",
+            "description": "Board after c4. Opponent captured with dxc4."
+          },
+          "reasoning": "Opponent accepted the gambit by taking on c4. I'll continue with e3 to prepare bishop development and eventual pawn recovery.",
+          "action": "move_pawn('e2', 'e3')"
+        },
+        {
+          "state": {
+            "image": "/data/trajectories/images/chess/after_e3_b5.png",
+            "description": "Board after e3. Opponent played b5 to defend the pawn."
+          },
+          "reasoning": "Opponent is trying to hold onto the extra pawn with b5. I'll develop my knight and prepare to recover the pawn.",
+          "action": "move_knight('b1', 'c3')"
+        }
+      ]
+    }
+  }
+} 
