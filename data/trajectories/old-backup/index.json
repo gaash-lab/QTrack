@@ -1,0 +1,34 @@
+{
+  "version": "1.0",
+  "lastUpdated": "2023-06-15",
+  "tasks": [
+    {
+      "id": "chess",
+      "name": "Chess Game",
+      "description": "LLM agent playing chess against a standard opponent",
+      "dataFile": "/data/trajectories/chess.json",
+      "thumbnail": "/data/trajectories/images/chess/thumbnail.png"
+    },
+    {
+      "id": "alfworld",
+      "name": "ALFWorld Navigation",
+      "description": "LLM agent navigating in a virtual household environment to complete tasks",
+      "dataFile": "/data/trajectories/alfworld.json",
+      "thumbnail": "/data/trajectories/images/alfworld/thumbnail.png"
+    },
+    {
+      "id": "webshop",
+      "name": "WebShop",
+      "description": "LLM agent shopping for items on an e-commerce website",
+      "dataFile": "/data/trajectories/webshop.json",
+      "thumbnail": "/data/trajectories/images/webshop/thumbnail.png"
+    },
+    {
+      "id": "text2sql",
+      "name": "Text2SQL",
+      "description": "LLM agent translating natural language queries to SQL",
+      "dataFile": "/data/trajectories/text2sql.json",
+      "thumbnail": "/data/trajectories/images/text2sql/thumbnail.png"
+    }
+  ]
+} 

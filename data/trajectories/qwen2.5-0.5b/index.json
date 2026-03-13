@@ -1,0 +1,27 @@
+{
+  "version": "1.0",
+  "lastUpdated": "2024-04-30",
+  "tasks": [
+    {
+      "id": "bi-arm-bandit",
+      "name": "Bi-Arm Bandit",
+      "description": "Agent solving the multi-armed bandit problem through exploration and exploitation",
+      "dataFile": "/data/trajectories/qwen2.5-0.5b/bi-arm-bandit.json",
+      "thumbnail": "/data/thumbnails/bi-arm-bandit.png"
+    },
+    {
+      "id": "sokoban",
+      "name": "Sokoban",
+      "description": "Agent solving Sokoban puzzles by planning and pushing boxes to designated locations",
+      "dataFile": "/data/trajectories/qwen2.5-0.5b/sokoban.json",
+      "thumbnail": "/data/thumbnails/sokoban.png"
+    },
+    {
+      "id": "frozen-lake",
+      "name": "Frozen Lake",
+      "description": "Agent navigating a frozen lake environment to reach a goal while avoiding holes",
+      "dataFile": "/data/trajectories/qwen2.5-0.5b/frozen-lake.json",
+      "thumbnail": "/data/thumbnails/frozen-lake.png"
+    }
+  ]
+} 

@@ -1,0 +1,64 @@
+{
+  "taskName": "Sokoban",
+  "taskDescription": "LLM agent solving the Sokoban puzzle by planning and executing valid box-pushing actions in a grid-based environment",
+  "trajectories": {
+    "traj1": {
+      "name": "Attempt 1",
+      "description": "The agent explores but fails to push the box to the target within the allowed actions",
+      "totalSteps": 2,
+      "success": false,
+      "validActionRate": "100%",
+      "effectiveActionRate": "0%",
+      "steps": [
+        {
+          "state": {
+            "description": "P: Player, _: Blank Space, #: Wall, X: Boxes, O: Targets\n```\n######\n#__P_#\n#_XO_#\n###__#\n######\n######\n```"
+          },
+          "reasoning": "Pushing boxes through walls is forbidden.",
+          "action": "Left, Down, Up"
+        },
+        {
+          "state": {
+            "description": "P: Player, _: Blank Space, #: Wall, X: Boxes, O: Targets\n```\n######\n#_P__#\n#_XO_#\n###__#\n######\n######\n```"
+          },
+          "reasoning": "Move towards the wall to avoid obstacles.",
+          "action": "Left, Down, Right"
+        },
+        {
+          "state": {
+            "description": "P: Player, _: Blank Space, #: Wall, √: Box on Target\n```\n######\n#____#\n#_P√_#\n###__#\n######\n######\n```\nEnd of trajectory"
+          }
+        }
+      ]
+    },
+    "traj2": {
+      "name": "Attempt 2",
+      "description": "Agent mispositions and fails to push the box effectively",
+      "totalSteps": 6,
+      "success": true,
+      "validActionRate": "100%",
+      "effectiveActionRate": "0%",
+      "steps": [
+        {
+          "state": {
+            "description": "P: Player, _: Blank Space, #: Wall, X: Boxes, O: Targets\n```\n######\n#___P#\n#_OX_#\n######\n######\n######\n```"
+          },
+          "reasoning": "Pushing the target boxes is crucial.",
+          "action": "Right, Up, Down"
+        },
+        {
+          "state": {
+            "description": "P: Player, _: Blank Space, #: Wall, X: Boxes, O: Targets\n```\n######\n#____#\n#_OXP#\n######\n######\n######\n```"
+          },
+          "reasoning": "Controlling the box next to the wall.",
+          "action": "Left, Down, Up"
+        },
+        {
+          "state": {
+            "description": "P: Player, _: Blank Space, #: Wall, √: Box on Target\n```\n######\n#____#\n#_√P_#\n######\n######\n######\n```\nEnd of trajectory"
+          }
+        }
+      ]
+    }
+  }
+}

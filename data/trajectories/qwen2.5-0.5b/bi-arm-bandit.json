@@ -1,0 +1,57 @@
+{
+  "taskName": "Bi-Arm Bandit",
+  "taskDescription": "LLM agent playing a symbolic bandit game, inferring reward distributions based on arm names like Dragon and Phoenix",
+  "trajectories": {
+    "traj1": {
+      "name": "Dragon Chosen for Strength",
+      "description": "Agent selects Dragon arm, citing its symbolic association with strength and courage",
+      "totalSteps": 1,
+      "success": false,
+      "validActionRate": "100%",
+      "effectiveActionRate": "N/A",
+      "steps": [
+        {
+          "state": {
+            "description": "You are playing a bandit game. Goal: Maximize your total reward by choosing which arm to pull. \nGame Rules: \n1. There are 2 arms, named Dragon and Phoenix\n2. Each arm has its own reward distribution, related to their names. \n3. Analyze the symbolic meaning of each arm's name to guess how their reward distribution might behave.\n4. Based on the symbolic meaning of their names, which arm do you think is more likely to give higher rewards on average? Choose between Dragon and Phoenix, and output like <answer> Dragon </answer> or <answer> Phoenix </answer>.\n\nYou have 1 actions left."
+          },
+          "reasoning": "Dragon has a symbolic meaning of courage and strength, while Phoenix represents hope and renewal. Dragon's reward distribution might be higher on average due to its connection to courage and strength, while Phoenix's might be higher on average due to its connection to hope and renewal.",
+          "action": "Dragon"
+        }
+      ]
+    },
+    "traj2": {
+      "name": "Phoenix Chosen for Renewal",
+      "description": "Agent selects Phoenix, reasoning from symbolic association with beauty and innocence",
+      "totalSteps": 1,
+      "success": false,
+      "validActionRate": "100%",
+      "effectiveActionRate": "N/A",
+      "steps": [
+        {
+          "state": {
+            "description": "You are playing a bandit game. Goal: Maximize your total reward by choosing which arm to pull. \nGame Rules: \n1. There are 2 arms, named Dragon and Phoenix\n2. Each arm has its own reward distribution, related to their names. \n3. Analyze the symbolic meaning of each arm's name to guess how their reward distribution might behave.\n4. Based on the symbolic meaning of their names, which arm do you think is more likely to give higher rewards on average? Choose between Dragon and Phoenix, and output like <answer> Dragon </answer> or <answer> Phoenix </answer>.\n\nYou have 1 actions left."
+          },
+          "reasoning": "The symbolic meaning of Dragon and Phoenix is related to power and control. Dragon represents strength and dominance, while Phoenix represents beauty and innocence. Both are valuable and important to the bandit game, but Dragon's strong rewards on average might be more significant due to its symbolic significance. Phoenix's rewards might be more modest, but it is still valuable to the bandit game.",
+          "action": "Phoenix"
+        }
+      ]
+    },
+    "traj3": {
+      "name": "Phoenix Chosen for Positivity",
+      "description": "Agent selects Phoenix, associating both arms with positivity but favoring Phoenix",
+      "totalSteps": 1,
+      "success": false,
+      "validActionRate": "100%",
+      "effectiveActionRate": "N/A",
+      "steps": [
+        {
+          "state": {
+            "description": "You are playing a bandit game. Goal: Maximize your total reward by choosing which arm to pull. \nGame Rules: \n1. There are 2 arms, named Dragon and Phoenix\n2. Each arm has its own reward distribution, related to their names. \n3. Analyze the symbolic meaning of each arm's name to guess how their reward distribution might behave.\n4. Based on the symbolic meaning of their names, which arm do you think is more likely to give higher rewards on average? Choose between Dragon and Phoenix, and output like <answer> Dragon </answer> or <answer> Phoenix </answer>.\n\nYou have 1 actions left."
+          },
+          "reasoning": "Since Dragon and Phoenix are names that have positive connotations, they are likely to give higher rewards on average. Dragon might represent a positive outcome or reward, while Phoenix might symbolize a negative outcome or reward.",
+          "action": "Phoenix"
+        }
+      ]
+    }
+  }
+}
