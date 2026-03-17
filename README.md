@@ -112,3 +112,29 @@ pip install -r requirements.txt
 pip install -e .
 ```
 
+## Training
+
+Training details and scripts will be provided soon.
+
+---
+
+## Evaluation
+
+Evaluation settings and benchmarks will be released soon.
+
+---
+
+## Citation
+If you find QTrack useful for your research, please cite:
+
+```bibtex
+@misc{ashraf2026qtrackquerydrivenreasoningmultimodal,
+      title={QTrack: Query-Driven Reasoning for Multi-modal MOT}, 
+      author={Tajamul Ashraf and Tavaheed Tariq and Sonia Yadav and Abrar Ul Riyaz and Wasif Tak and Moloud Abdar and Janibul Bashir},
+      year={2026},
+      eprint={2603.13759},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2603.13759}, 
+}
+```
