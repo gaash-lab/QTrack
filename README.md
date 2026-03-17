@@ -16,7 +16,7 @@
 
 This is the official PyTorch implementation of QTrack:
 
-["**QTrack: Query-Driven Reasoning for Multi-modal MOT**"](https://arxiv.org/abs/2603.13759) by [Tajamul Ashraf](https://www.tajamulashraf.com/), [Tavaheed Tariq](https://tavaheed.netlify.app/), [Sonia Yadav](), [Abrar Ul Riyaz](), [Wasif Tak](), [Moloud Abdar](), and [Janibul Bashir](https://www.janibbashir.com/).
+["**QTrack: Query-Driven Reasoning for Multi-modal MOT**"](https://arxiv.org/abs/2603.13759) by [Tajamul Ashraf](https://www.tajamulashraf.com/), [Tavaheed Tariq](https://tavaheed.netlify.app/), [Sonia Yadav](https://sonia-yadav.netlify.app/), [Abrar Ul Riyaz](https://abrarulriyaz.vercel.app/), [Wasif Tak](), [Moloud Abdar](), and [Janibul Bashir](https://www.janibbashir.com/).
 
 ---
 
