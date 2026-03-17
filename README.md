@@ -6,6 +6,21 @@
 
 <div align="center">
 
+<table>
+<tr>
+<td align="center">
+<img src="https://github.com/user-attachments/assets/8a25fe07-06bb-4701-ba0a-88109b9be929" width="350" height="350">
+</td>
+
+<td align="center">
+<img src="https://github.com/user-attachments/assets/2891bb81-f3f0-4d01-8323-a4cf1ac9c68b" width="350" height="350">
+</td>
+</tr>
+</table>
+
+
+
+
 # [QTrack: Query-Driven Reasoning for Multi-modal MOT](https://arxiv.org/abs/2603.13759)
 [![Website](https://img.shields.io/badge/website-QTrack-purple)](https://gaash-lab.github.io/QTrack/)
 [![Weights](https://img.shields.io/badge/weights-huggingface-blue)](https://huggingface.co/GAASH-Lab/QTrack)
