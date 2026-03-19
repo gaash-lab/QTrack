@@ -24,8 +24,7 @@ body {
     flex-direction: column;
     min-height: 100%;
 
-    background-image: url('/src/assets/background-blurred.svg');
-    /* Note: You may need to move this file to public/ or ensure your Astro config handles /src/ paths */
+    /* background-image: url('/src/assets/background-blurred.svg'); */
     background-size: cover;
     background-position: center center;
     background-repeat: no-repeat;
@@ -34,7 +33,7 @@ body {
 }
 
 main {
-   padding-top: var(--header-height);
+   /* padding-top: var(--header-height); */
    flex-grow: 1; /* Allows main content to push footer down */
 }
 

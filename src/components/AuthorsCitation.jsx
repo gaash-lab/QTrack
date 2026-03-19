@@ -2,14 +2,11 @@
 import { useState } from "react";
 import "../styles/authorsCitation.css";
 
-const citationText = `@misc{ragen,
-  title={RAGEN: Understanding Self-Evolution in LLM Agents via Multi-Turn Reinforcement Learning}, 
-  author={Zihan Wang and Kangrui Wang and Qineng Wang and Pingyue Zhang and Linjie Li and Zhengyuan Yang and Xing Jin and Kefan Yu and Minh Nhat Nguyen and Licheng Liu and Eli Gottlieb and Yiping Lu and Kyunghyun Cho and Jiajun Wu and Li Fei-Fei and Lijuan Wang and Yejin Choi and Manling Li},
-  year={2025},
-  eprint={2504.20073},
-  archivePrefix={arXiv},
-  primaryClass={cs.LG},
-  url={https://arxiv.org/abs/2504.20073}, 
+const citationText = `@inproceedings{Ashraf2026QTrackQR,
+  title={QTrack: Query-Driven Reasoning for Multi-modal MOT},
+  author={Tajamul Ashraf and Tavaheed Tariq and Sonia Yadav and Abrar Ul Riyaz and Wasif Tak and Moloud Abdar and Janibul Bashir},
+  year={2026},
+  url={https://api.semanticscholar.org/CorpusID:286568599}
 }`;
 
 function AuthorsCitation() {
@@ -41,7 +38,7 @@ function AuthorsCitation() {
 
         <div className="citation-section">
           <p>
-            If you find RAGEN useful in your research, we would appreciate it if
+            If you find QTrack useful in your research, we would appreciate it if
             you consider citing our work:
           </p>
 

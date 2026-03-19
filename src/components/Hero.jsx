@@ -5,37 +5,31 @@ import "../styles/global.css";
 import "../styles/resources.css";
 
 function Hero() {
-  const [stars, setStars] = useState("1.4k");
-  const [forks, setForks] = useState("105");
+  const [stars, setStars] = useState("0");
+  const [forks, setForks] = useState("0");
 
-  const animatedText = "Query-Driven Reasoning for multimodal MOT ";
-  const motText = "Multiple Object Tracking";
+  const animatedText = "Query-Driven Reasoning for multimodal MOT";
+  const motText = "QTrack";
 
   useEffect(() => {
     async function fetchGitHubStats() {
       try {
         const response = await fetch(
-          "https://api.github.com/repos/RAGEN-AI/RAGEN",
+          "https://api.github.com/repos/gaash-lab/QTrack"
         );
-
-        if (!response.ok) {
-          throw new Error("GitHub API error");
-        }
 
         const data = await response.json();
 
-        const formatNumber = (num) =>
-          num > 999 ? (num / 1000).toFixed(1) + "k" : num;
-
         if (data.stargazers_count !== undefined) {
-          setStars(formatNumber(data.stargazers_count));
+          setStars(data.stargazers_count);
         }
 
         if (data.forks_count !== undefined) {
-          setForks(formatNumber(data.forks_count));
+          setForks(data.forks_count);
         }
+
       } catch (error) {
-        console.error("Error fetching GitHub stats:", error);
+        console.error("GitHub fetch error:", error);
       }
     }
 
@@ -45,19 +39,19 @@ function Hero() {
   return (
     <section id="hero" className="hero-section">
       <div className="title-wrapper">
-        <img src="/icon.png" alt="MOT Icon" className="title-icon" />
+        <img src="QTrack-logo.png" alt="MOT Icon" className="title-icon" />
 
-        <h1 className="main-title">
-          {motText.split("").map((char, index) => (
-            <span
-              key={index}
-              className="reveal-char-title"
-              style={{ animationDelay: `${index * 0.1}s` }}
-            >
-              {char === " " ? "\u00A0" : char}
-            </span>
-          ))}
-        </h1>
+          <h1 className="main-title">
+            {motText.split("").map((char, index) => (
+              <span
+                key={index}
+                className="reveal-char-title"
+                style={{ animationDelay: `${index * 0.1}s` }}
+              >
+                {char === " " ? "\u00A0" : char}
+              </span>
+            ))}
+          </h1>
       </div>
 
       <p className="subtitle">
@@ -73,23 +67,56 @@ function Hero() {
       </p>
 
       <p className="description">
-        Deep Learning + Computer Vision <br />
-        to track multiple objects simultaneously in dynamic video environments.
-        <br />
-        <a
-          href="https://vagen-ai.github.io/"
-          className="vagen-announcement"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Announcing <b>TrackNet</b> for MOT Systems &gt;
-        </a>
+        <strong>TLDR; </strong> This work introduces a query-driven tracking paradigm that formulates tracking as a spatiotemporal reasoning problem conditioned on natural language queries, and presents QTrack, an end-to-end vision-language model that integrates multimodal reasoning with tracking-oriented localization.
       </p>
+
+
+      {/* Authors Section */}
+      <div className="authors-section">
+        <h3 className="section-title">Authors</h3>
+        <div className="authors-list">
+          <p>
+            <a href="https://www.tajamulashraf.com/">Tajamul Ashraf</a>
+            <sup className="affiliation-marker">1,4*</sup>,
+            <a href="https://tavaheed.netlify.app/">Tavaheed Tariq</a>
+            <sup className="affiliation-marker">4†</sup>,
+            <a href="https://sonia-yadav.netlify.app/">Sonia Yadav</a>
+            <sup className="affiliation-marker">4†</sup>,
+            <a href="https://abrarulriyaz.vercel.app/">Abrar Ul Riyaz</a>
+            <sup className="affiliation-marker">4†</sup>,
+            <a href="">Wasif Tak</a>
+            <sup className="affiliation-marker">2</sup>,
+            <a href="https://scholar.google.com/citations?user=PwgggdIAAAAJ&hl=en">Moloud Abdar</a>
+            <sup className="affiliation-marker">3</sup>,
+            <a href="https://www.janibbashir.com/">Janibul Bashir</a>
+            <sup className="affiliation-marker">4</sup>
+          </p>
+
+          <p className="equal-contribution">
+            <sup className="affiliation-marker">*</sup> Corresponding author
+            &nbsp;&nbsp;
+            <sup className="affiliation-marker">†</sup> Equal Contribution
+          </p>
+
+          <p className="affiliations">
+            <sup className="affiliation-marker">1</sup> King Abdullah University of Science and Technology (KAUST), Saudi Arabia
+            &nbsp;&nbsp;
+            <br />
+            <sup className="affiliation-marker">2</sup> Thapar Institute of Engineering and Technology, India
+            &nbsp;&nbsp;
+            <br />
+            <sup className="affiliation-marker">3</sup> The University of Queensland, Australia
+            &nbsp;&nbsp;
+            <br />
+            <sup className="affiliation-marker">4</sup> Gaash Research Lab, National Institute of Technology Srinagar, India
+          </p>
+        </div>
+      </div>
 
       {/* GitHub Button */}
 
       <a
-        href="https://github.com/ya-sonia/MOT"
+        href="https://github.com/gaash-lab/QTrack"
         className="cta-button"
         target="_blank"
         rel="noopener noreferrer"
@@ -137,11 +164,11 @@ function Hero() {
 
       {/* Resources Section */}
 
-      {/* <section className="resources-section">
+      <section className="resources-section">
         <h3 className="resources-title">Resources</h3>
         <div className="resources-buttons">
           <a
-            href="https://arxiv.org/abs/2101.02702"
+            href="https://arxiv.org/abs/2603.13759"
             className="resource-button"
             target="_blank"
             rel="noopener noreferrer"
@@ -153,50 +180,43 @@ function Hero() {
               <line x1="16" y1="17" x2="8" y2="17" />
               <polyline points="10 9 9 9 8 9" />
             </svg>
-            <span>Paper</span>
+            <span>Arxiv Paper</span>
           </a>
 
           <a
-            href="https://ragen-doc.readthedocs.io/"
+            href="https://github.com/gaash-lab/QTrack"
             className="resource-button"
             target="_blank"
             rel="noopener noreferrer"
           >
             <svg viewBox="0 0 24 24" className="resource-icon">
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
             </svg>
-            <span>Documentation</span>
+            <span>Github Repo</span>
           </a>
 
+
           <a
-            href="https://x.com/wzihanw/status/1915052871474712858"
+            href="https://huggingface.co/datasets/GAASH-Lab/RMOT26"
             className="resource-button"
             target="_blank"
             rel="noopener noreferrer"
           >
             <svg viewBox="0 0 24 24" className="resource-icon">
-              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
             </svg>
-            <span>tl;dr</span>
+            <span>HuggingFace Data</span>
           </a>
 
-          <a
-            href="https://api.wandb.ai/links/zihanwang-ai-northwestern-university/a8er8l7b"
-            className="resource-button"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <svg viewBox="0 0 24 24" className="resource-icon">
-              <path d="M21 3v18M3 9h18M3 15h18M3 21h18" />
-              <path d="M3 3h18" />
-              <path d="M9 21V9" />
-              <path d="M15 21V9" />
-            </svg>
-            <span>Logs</span>
-          </a>
 
           <a
-            href="https://mll-lab-nu.github.io/joinus/"
+            href="https://gaash.nitsri.ac.in/"
             className="resource-button"
             target="_blank"
             rel="noopener noreferrer"
@@ -210,96 +230,18 @@ function Hero() {
             <span>Collaborate with us →</span>
           </a>
         </div>
-      </section> */}
+      </section>
+
+      
 
       {/* Diagram Section */}
-      {/* <div className="diagram-placeholder">
-        <img src="/teaser.jpeg" alt="MOT Diagram" />
+      <div className="diagram-placeholder">
+        <img src="teasor.jpg" alt="MOT Diagram" />
         <p style={{ textAlign: "center", color: "#888" }}>
-          Comparison between traditional MOT and ours work.
+          <strong>Comparison of tracking paradigms.</strong> (a) Traditional MOT follows a tracking-by-detection paradigm, tracking all objects from predefined categories regardless of user intent. (b) QTrack enables reasoning-aware, query-conditioned tracking: given a video and natural language query, it selectively identifies and tracks only the specified targets, shifting from all-object tracking to semantic, user-driven tracking.
         </p>
-      </div> */}
+      </div>
 
-      {/* Authors Section */}
-      {/* <div className="authors-section">
-        <h3 className="section-title">Authors</h3>
-        <div className="authors-list">
-          <p>
-            <a href="https://zihanwang314.github.io/">Zihan Wang</a>
-            <sup className="affiliation-marker">*1</sup>,
-            <a href="https://jameskrw.github.io/">Kangrui Wang</a>
-            <sup className="affiliation-marker">*1</sup>,
-            <a href="https://qinengwang-aiden.github.io/">Qineng Wang</a>
-            <sup className="affiliation-marker">*1</sup>,
-            <a href="https://williamzhangsjtu.github.io/">Pingyue Zhang</a>
-            <sup className="affiliation-marker">*1</sup>,
-            <a href="https://scholar.google.com/citations?user=WR875gYAAAAJ&hl=en">
-              Linjie Li
-            </a>
-            <sup className="affiliation-marker">*2</sup>
-          </p>
-
-          <p>
-            <a href="https://zyang-ur.github.io/">Zhengyuan Yang</a>
-            <sup className="affiliation-marker">4</sup>,<a href="">Xing Jin</a>
-            <sup className="affiliation-marker">6</sup>,
-            <a href="https://www.linkedin.com/in/kefan-yu-22723a25b/en/">
-              Kefan Yu
-            </a>
-            <sup className="affiliation-marker">1</sup>,
-            <a href="https://www.linkedin.com/in/menhguin/?originalSubdomain=sg">
-              Minh Nhat Nguyen
-            </a>
-            <sup className="affiliation-marker">7</sup>,
-            <a href="">Licheng Liu</a>
-            <sup className="affiliation-marker">1</sup>,
-            <a href="https://www.linkedin.com/in/eli-gottlieb1/">
-              Eli Gottlieb
-            </a>
-            <sup className="affiliation-marker">1</sup>,
-          </p>
-
-          <p>
-            <a href="https://2prime.github.io/">Yiping Lu</a>
-            <sup className="affiliation-marker">1</sup>,
-            <a href="https://kyunghyuncho.me/">Kyunghyun Cho</a>
-            <sup className="affiliation-marker">5</sup>,
-            <a href="https://jiajunwu.com/">Jiajun Wu</a>
-            <sup className="affiliation-marker">3</sup>,
-            <a href="https://profiles.stanford.edu/fei-fei-li">Li Fei-Fei</a>
-            <sup className="affiliation-marker">3</sup>,
-            <a href="https://www.microsoft.com/en-us/research/people/lijuanw/">
-              Lijuan Wang
-            </a>
-            <sup className="affiliation-marker">4</sup>,
-            <a href="https://homes.cs.washington.edu/~yejin/">Yejin Choi</a>
-            <sup className="affiliation-marker">3</sup>,
-            <a href="https://limanling.github.io/">Manling Li</a>
-            <sup className="affiliation-marker">1</sup>
-          </p>
-
-          <p className="equal-contribution">
-            <sup className="affiliation-marker">*</sup> Equal Contribution
-          </p>
-
-          <p className="affiliations">
-            <sup className="affiliation-marker">1</sup> Northwestern University
-            &nbsp;&nbsp;
-            <sup className="affiliation-marker">2</sup> University of Washington
-            &nbsp;&nbsp;
-            <sup className="affiliation-marker">3</sup> Stanford University
-            &nbsp;&nbsp;
-            <sup className="affiliation-marker">4</sup> Microsoft &nbsp;&nbsp;
-            <br />
-            <sup className="affiliation-marker">5</sup> New York University
-            &nbsp;&nbsp;
-            <sup className="affiliation-marker">6</sup> University of British
-            Columbia &nbsp;&nbsp;
-            <sup className="affiliation-marker">7</sup> Singapore Management
-            University &nbsp;&nbsp;
-          </p>
-        </div>
-      </div> */}
     </section>
   );
 }

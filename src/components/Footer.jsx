@@ -1,14 +1,14 @@
 import "../styles/footer.css";
 
 function Footer() {
-  const currentYear = new Date().getFullYear(); // dynamic year
+  const currentYear = new Date().getFullYear(); 
 
   return (
     <footer className="simple-footer">
       <p>
         Copyright © {currentYear} - All right reserved by{" "}
         <a
-          href="https://github.com/ya-sonia/MOT"
+          href="https://gaash.nitsri.ac.in"
           target="_blank"
           rel="noopener noreferrer"
         >
@@ -19,7 +19,7 @@ function Footer() {
       <p>
         Website maintained by{" "}
         <a
-          href="https://github.com/ya-sonia/MOT"
+          href="https://gaash.nitsri.ac.in"
           target="_blank"
           rel="noopener noreferrer"
         >

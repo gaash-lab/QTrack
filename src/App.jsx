@@ -1,31 +1,26 @@
-import { useState } from 'react'
-// import reactLogo from './assets/react.svg'
-// import viteLogo from '/vite.svg'
 import './App.css'
 import Header from './components/Header';
-// import AuthorsCitation from "./components/AuthorsCitation";
-// import Algorithm from './components/Algorithm';
-// import ChartsSection from './components/ChartsSection';
-// import FindingsSection from './components/FindingsSection';
+import AuthorsCitation from "./components/AuthorsCitation";
+import Algorithm from './components/Algorithm';
+import ChartsSection from './components/ChartsSection';
 import Footer from './components/Footer';
-// import TrajectoryViewer from "./components/TrajectoryViewer.tsx";
 import Hero from './components/Hero';
+import Results from './components/Results.jsx';
+import Abstract from './components/Abstract.jsx';
 
 
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
     <>
       <Header />
         <main>
                 <Hero />
-                {/* <Algorithm/>
+                <Abstract />
+                <Algorithm/>
+                <Results />
                 <ChartsSection />
-                <FindingsSection />
-                <TrajectoryViewer />
-                <AuthorsCitation /> */}
+                <AuthorsCitation />
         
         </main>
         

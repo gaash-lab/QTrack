@@ -1,0 +1,120 @@
+/* ─── Ablation Studies (ChartsSection) ───────────────────── */
+
+.ablation-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+}
+
+/* Meta row: model badges + frame badges */
+.ablation-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 1rem 1.25rem 0.75rem;
+  border-bottom: 1px solid #f0f0f0;
+  background: #fafafa;
+}
+
+.ablation-models,
+.ablation-frames {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.ablation-models {
+  flex: 1 1 auto;
+}
+
+.model-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: #eef2ff;
+  color: #3730a3;
+  border: 1px solid #c7d2fe;
+  letter-spacing: 0.02em;
+}
+
+.model-badge.ours {
+  background: #ecfdf5;
+  color: #065f46;
+  border-color: #6ee7b7;
+}
+
+.frame-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.73rem;
+  font-weight: 500;
+  background: #f3f4f6;
+  color: #6b7280;
+  border: 1px solid #e5e7eb;
+}
+
+/* Query bubble */
+.ablation-query {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 0.9rem 1.25rem;
+  background: #f0f9ff;
+  border-bottom: 1px solid #e0f2fe;
+}
+
+.query-label {
+  flex-shrink: 0;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #0369a1;
+  margin-top: 2px;
+  background: #bae6fd;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.query-text {
+  margin: 0;
+  font-size: 0.84rem;
+  color: #1e3a5f;
+  line-height: 1.55;
+  font-style: italic;
+}
+
+/* Figure */
+.ablation-figure {
+  padding: 1rem 1.25rem;
+  background: #111;
+  text-align: center;
+}
+
+.ablation-img {
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 6px;
+}
+
+/* Observation description */
+.ablation-description {
+  margin: 0;
+  padding: 0.85rem 1.25rem;
+  font-size: 0.86rem;
+  color: #444;
+  line-height: 1.6;
+  background: #fafafa;
+  border-top: 1px solid #f0f0f0;
+}
+
+.ablation-description strong {
+  color: #1a73e8;
+}

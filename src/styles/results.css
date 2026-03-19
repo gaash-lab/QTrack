@@ -1,0 +1,146 @@
+/* ─── Results Section ─────────────────────────────────────── */
+
+/* Tab bar */
+.results-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 1.8rem;
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 0;
+}
+
+.results-tab {
+  padding: 0.55rem 1.2rem;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #777;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+  margin-bottom: -1px;
+}
+
+.results-tab:hover {
+  color: #333;
+}
+
+.results-tab.active {
+  color: #1a73e8;
+  border-bottom-color: #1a73e8;
+}
+
+/* Caption above each table */
+.table-caption {
+  font-size: 0.88rem;
+  color: #555;
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+
+/* Horizontal scroll wrapper for narrow screens */
+.table-wrapper {
+  overflow-x: auto;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+/* Base table */
+.results-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+.results-table th {
+  background-color: #2563eb;
+  color: #fff;
+  font-weight: 600;
+  padding: 0.65rem 1rem;
+  text-align: center;
+  font-size: 0.82rem;
+  letter-spacing: 0.02em;
+}
+
+.results-table th:first-child {
+  text-align: left;
+  border-radius: 8px 0 0 0;
+}
+
+.results-table th:last-child {
+  border-radius: 0 8px 0 0;
+}
+
+.results-table td {
+  padding: 0.55rem 1rem;
+  text-align: center;
+  border-bottom: 1px solid #f0f0f0;
+  color: #333;
+}
+
+.results-table td:first-child {
+  text-align: left;
+  font-weight: 500;
+}
+
+/* Alternating row tint */
+.results-table tbody tr:nth-child(even):not(.group-header):not(.ours-row) {
+  background-color: #f8faff;
+}
+
+/* Group header rows */
+.group-header td {
+  font-weight: 700;
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.45rem 1rem;
+  border-bottom: 1px solid #dde;
+  background-color: transparent !important;
+}
+
+.opensource-header td  { color: #2563eb; background-color: #eff6ff !important; }
+.reasoning-header td   { color: #7c3aed; background-color: #f5f3ff !important; }
+.closed-header td      { color: #b45309; background-color: #fffbeb !important; }
+
+/* Our method row */
+.ours-row {
+  background-color: #ecfdf5 !important;
+}
+
+.ours-row td {
+  color: #065f46 !important;
+  font-weight: 600;
+  border-top: 2px solid #6ee7b7;
+}
+
+/* Underlined second-best values */
+.underline-val {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: #aaa;
+}
+
+/* ─── MOT17 / DanceTrack side-by-side ─────────────────────── */
+
+.mot-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+@media (max-width: 700px) {
+  .mot-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.subtable-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 0.6rem;
+  letter-spacing: 0.01em;
+}
