@@ -4,12 +4,12 @@ set -x
 
 export VLLM_ATTENTION_BACKEND=XFORMERS
 
-export MODEL_PATH=/home/gaash/Wasif/Tawheed/Rmot_logs/Saved_Checkpoints/QTRACK/run_visionreasoner_7b_4x80G/global_step_7196/actor/huggingface
+export MODEL_PATH=/home/gaash/Wasif/Tawheed/QTrackCheckpoints/QTrack/actor/huggingface
 
 RUN_NAME=$(basename "$0" .sh)
 
 python3 -m verl.trainer.main \
-    config=/home/gaash/Wasif/Tawheed/RMOT/training_scripts/visionreasoner_7b.yaml \
+    config=/home/gaash/Wasif/Tawheed/QTrack/training_scripts/qtrack.yaml\
     data.train_files=/home/gaash/Wasif/Tawheed/MOT_grounding_Dataset/hf_dataset_qtrack \
     data.val_files=None \
     worker.actor.model.model_path=${MODEL_PATH} \
@@ -25,4 +25,4 @@ python3 -m verl.trainer.main \
     trainer.experiment_name=${RUN_NAME} \
     trainer.n_gpus_per_node=1 \
     trainer.total_episodes=4 \
-    trainer.save_checkpoint_path=/home/gaash/Wasif/Tawheed/Rmot_logs/Saved_Checkpoints/QTRACK_new/${RUN_NAME}
+    trainer.save_checkpoint_path=./Outputs/${RUN_NAME}

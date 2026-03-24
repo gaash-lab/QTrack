@@ -488,7 +488,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--json", default="/home/gaash/Wasif/Tawheed/MOT_grounding_Dataset/test/annotations_real.json")
     parser.add_argument("--dataset_root", default="/home/gaash/Wasif/Tawheed/MOT_grounding_Dataset/test")
-    # parser.add_argument("--model_path", default="/home/2022bite008/Wasif/RMOT_Checkpoints/QTrack/global_step_6168/actor/huggingface") #0.29 0.54 126 0.70 0.13
     parser.add_argument("--model_path", default="/home/gaash/Wasif/Tawheed/Rmot_logs/Saved_Checkpoints/QTRACK_new/run_visionreasoner_7b_4x80G/global_step_6168/actor/huggingface")
     parser.add_argument("--out", default="/home/gaash/Tawheed/Reasoning/QTrack_logs/visionreasoner_bbox_eval_QTRACK_new_6168.json")
     args = parser.parse_args()
