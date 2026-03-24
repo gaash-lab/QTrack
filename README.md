@@ -128,14 +128,14 @@ pip install -e .
 ```
 
 ## Training
-Please change model path and data paths in [config file](training_scripts/visionreasoner_7b.yaml) and [bash script](training_scripts/run_visionreasoner_7b_4x80G.sh).
+Please change model path and data paths in [config file](training_scripts/qtrack.yaml) and [bash script](training_scripts/train_qtrack.sh).
 
 ```bash
 export VLLM_USE_MODEL_INSPECTOR=0
 export VLLM_ATTENTION_BACKEND=XFORMERS
 
-cd /home/gaash/Wasif/Tawheed/Seg-Zero_with_TAPO/training_scripts
-bash run_visionreasoner_7b_4x80G.sh
+cd training_scripts
+bash train_qtrack.sh
 ```
 
 ---
