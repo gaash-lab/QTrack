@@ -128,6 +128,16 @@ pip install -e .
 ```
 
 ## Training
+Before training, prepare you dataset using:
+
+```bash
+python prepare_dataset/build_qtrack_dataset.py \
+    --dataset_root <path_to_RMOT26> \
+    --train_dir train \
+    --jsonl annotations.jsonl \
+    --output_dir hf_dataset_qtrack 
+```
+
 Please change model path and data paths in [config file](training_scripts/qtrack.yaml) and [bash script](training_scripts/train_qtrack.sh).
 
 ```bash
