@@ -153,7 +153,7 @@ bash train_qtrack.sh
 ## Evaluation
 
 ```bash
-python evaluation_scripts/common_evaluation_visionreasoner_prev.py \
+python evaluation_scripts/evaluate_QTrack.py \
   --json <test json file> \
   --dataset_root <data est dir> \
   --model_path <model path> \
