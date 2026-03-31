@@ -4,7 +4,7 @@ set -x
 
 export VLLM_ATTENTION_BACKEND=XFORMERS
 
-export MODEL_PATH=/home/gaash/Wasif/Tawheed/QTrackCheckpoints/QTrack/actor/huggingface
+export MODEL_PATH=/home/gaash/Wasif/Tawheed/QTrack/pretrained_models/Qwen2.5-VL-3B-Instruct
 
 RUN_NAME=$(basename "$0" .sh)
 

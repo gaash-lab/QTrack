@@ -831,6 +831,7 @@ class RayPPOTrainer:
                             aug_batch.non_tensor_batch["image_grid_thw"] = aug_image_grid_thw
                             
                             aug_log_prob = self.actor_rollout_wg.compute_log_prob(aug_batch)
+                            aug_log_prob.batch["aug_old_log_probs"] = aug_log_prob.batch.pop("old_log_probs")  # Newly added due to key mismatch
                             batch = batch.union(aug_log_prob)
 
                     if self.use_reference_policy:

@@ -24,13 +24,7 @@ def vision_reasoner_format_reward(predict_str: str) -> float:
                 if 'bbox_2d' in item:
                     bbox_2d = item['bbox_2d']
                     if isinstance(bbox_2d, list) and len(bbox_2d) == 4:
-                        cur_reward += 1.0
-                    
-                if 'point_2d' in item:
-                    point_2d = item['point_2d']
-                    if isinstance(point_2d, list) and len(point_2d) == 2:
-                        cur_reward += 1.0
-                
+                        cur_reward += 1.0                
                 segmentation_format_reward += cur_reward / data_cnt
         except Exception:
             pass
@@ -40,66 +34,116 @@ def vision_reasoner_format_reward(predict_str: str) -> float:
     
     return thinking_format_reward + segmentation_format_reward
 
+# def vision_reasoner_accuracy_reward(predict_str: str, ground_truth: str) -> float:
+#     max_accuracy_reward = 0.0
+#     MAX_OBJECTS = 120  # 设置上限
+    
+#     try:
+#         gt_data = json.loads(ground_truth)
+#         gt_bboxes = [item['bbox_2d'] for item in gt_data]
+#         gt_points = [item['point_2d'] for item in gt_data]
+            
+#         #json_match = re.search(r'```json\s*(.*?)\s*```', predict_str, re.DOTALL)
+#         json_match = re.search(r'<answer>\s*(.*?)\s*</answer>', predict_str, re.DOTALL)
+#         if json_match:
+#             data = json.loads(json_match.group(1))
+#             pred_bboxes = [item['bbox_2d'] for item in data]
+#             pred_points = [item['point_2d'] for item in data]
+            
+#             # 只有当预测或真实值超过上限时才截断
+#             if len(pred_bboxes) > MAX_OBJECTS:
+#                 pred_bboxes = pred_bboxes[:MAX_OBJECTS]
+#                 pred_points = pred_points[:MAX_OBJECTS]
+            
+#             if len(gt_bboxes) > MAX_OBJECTS:
+#                 gt_bboxes = gt_bboxes[:MAX_OBJECTS]
+#                 gt_points = gt_points[:MAX_OBJECTS]
+            
+#             # 预处理数据为numpy数组
+#             pred_bboxes = np.array(pred_bboxes)  # (M,4)
+#             pred_points = np.array(pred_points)  # (M,2)
+#             gt_bboxes = np.array(gt_bboxes)    # (N,4)
+#             gt_points = np.array(gt_points)     # (N,2)
+            
+#             # 并行计算所有指标
+#             iou_matrix = batch_iou(pred_bboxes, gt_bboxes)  # (M,N)
+#             l1_matrix = batch_l1_distance(pred_bboxes, gt_bboxes)  # (M,N)
+#             points_dist_matrix = batch_points_distance(pred_points, gt_points)  # (M,N)
+#             points_in_box = batch_points_in_box(pred_points, pred_bboxes)  # (M,)
+            
+#             # 计算reward矩阵
+#             iou_reward = (iou_matrix > 0.5).astype(float)
+#             bbox_l1_reward = (l1_matrix < 10).astype(float)
+#             point_reward = ((points_dist_matrix < 30) & points_in_box[:,np.newaxis]).astype(float)
+            
+#             # 构建最终的cost矩阵
+#             cost_matrix = 3.0 - (iou_reward + bbox_l1_reward + point_reward)
+            
+#             # 使用匈牙利算法找最优匹配
+#             row_indices, col_indices = linear_sum_assignment(cost_matrix)
+            
+#             # 直接从cost_matrix计算总reward
+#             total_reward = len(row_indices) * 3.0 - cost_matrix[row_indices, col_indices].sum()
+            
+#             # 计算平均reward
+#             max_length = max(len(pred_bboxes), len(gt_bboxes))
+#             max_accuracy_reward = total_reward / max_length
+            
+#     except Exception:
+#         pass
+#     return max_accuracy_reward
+
 def vision_reasoner_accuracy_reward(predict_str: str, ground_truth: str) -> float:
     max_accuracy_reward = 0.0
-    MAX_OBJECTS = 120  # 设置上限
-    
+    MAX_OBJECTS = 120
+
     try:
         gt_data = json.loads(ground_truth)
         gt_bboxes = [item['bbox_2d'] for item in gt_data]
-        gt_points = [item['point_2d'] for item in gt_data]
-            
-        #json_match = re.search(r'```json\s*(.*?)\s*```', predict_str, re.DOTALL)
+
         json_match = re.search(r'<answer>\s*(.*?)\s*</answer>', predict_str, re.DOTALL)
-        if json_match:
-            data = json.loads(json_match.group(1))
-            pred_bboxes = [item['bbox_2d'] for item in data]
-            pred_points = [item['point_2d'] for item in data]
-            
-            # 只有当预测或真实值超过上限时才截断
-            if len(pred_bboxes) > MAX_OBJECTS:
-                pred_bboxes = pred_bboxes[:MAX_OBJECTS]
-                pred_points = pred_points[:MAX_OBJECTS]
-            
-            if len(gt_bboxes) > MAX_OBJECTS:
-                gt_bboxes = gt_bboxes[:MAX_OBJECTS]
-                gt_points = gt_points[:MAX_OBJECTS]
-            
-            # 预处理数据为numpy数组
-            pred_bboxes = np.array(pred_bboxes)  # (M,4)
-            pred_points = np.array(pred_points)  # (M,2)
-            gt_bboxes = np.array(gt_bboxes)    # (N,4)
-            gt_points = np.array(gt_points)     # (N,2)
-            
-            # 并行计算所有指标
-            iou_matrix = batch_iou(pred_bboxes, gt_bboxes)  # (M,N)
-            l1_matrix = batch_l1_distance(pred_bboxes, gt_bboxes)  # (M,N)
-            points_dist_matrix = batch_points_distance(pred_points, gt_points)  # (M,N)
-            points_in_box = batch_points_in_box(pred_points, pred_bboxes)  # (M,)
-            
-            # 计算reward矩阵
-            iou_reward = (iou_matrix > 0.5).astype(float)
-            bbox_l1_reward = (l1_matrix < 10).astype(float)
-            point_reward = ((points_dist_matrix < 30) & points_in_box[:,np.newaxis]).astype(float)
-            
-            # 构建最终的cost矩阵
-            cost_matrix = 3.0 - (iou_reward + bbox_l1_reward + point_reward)
-            
-            # 使用匈牙利算法找最优匹配
-            row_indices, col_indices = linear_sum_assignment(cost_matrix)
-            
-            # 直接从cost_matrix计算总reward
-            total_reward = len(row_indices) * 3.0 - cost_matrix[row_indices, col_indices].sum()
-            
-            # 计算平均reward
-            max_length = max(len(pred_bboxes), len(gt_bboxes))
-            max_accuracy_reward = total_reward / max_length
-            
-    except Exception:
-        pass
+        if not json_match:
+            return max_accuracy_reward
+
+        data = json.loads(json_match.group(1))
+
+        # Accept both "bbox" and "bbox_2d" keys
+        pred_bboxes = [item.get('bbox_2d') or item.get('bbox') for item in data]
+        pred_bboxes = [b for b in pred_bboxes if b is not None]  # drop items with neither key
+
+        if not pred_bboxes or not gt_bboxes:
+            return max_accuracy_reward
+
+        # Truncate to MAX_OBJECTS
+        pred_bboxes = pred_bboxes[:MAX_OBJECTS]
+        gt_bboxes   = gt_bboxes[:MAX_OBJECTS]
+
+        pred_bboxes = np.array(pred_bboxes)  # (M,4)
+        gt_bboxes   = np.array(gt_bboxes)    # (N,4)
+
+        # Compute bbox-only metrics
+        iou_matrix = batch_iou(pred_bboxes, gt_bboxes)        # (M,N)
+        l1_matrix  = batch_l1_distance(pred_bboxes, gt_bboxes) # (M,N)
+
+        iou_reward   = (iou_matrix > 0.5).astype(float)
+        bbox_l1_reward = (l1_matrix < 10).astype(float)
+
+        # Max reward per pair is now 2.0 (no point reward)
+        cost_matrix = 2.0 - (iou_reward + bbox_l1_reward)
+
+        row_indices, col_indices = linear_sum_assignment(cost_matrix)
+
+        total_reward = len(row_indices) * 2.0 - cost_matrix[row_indices, col_indices].sum()
+
+        max_length = max(len(pred_bboxes), len(gt_bboxes))
+        max_accuracy_reward = total_reward / max_length
+
+    except Exception as e:
+        print(f"accuracy_reward exception: {e}")
+
     return max_accuracy_reward
 
-def vision_reasoner_mcp_reward(gt_prev_bbox, gt_curr_bbox, pred_curr_bbox, alpha=0.9, eps=1e-6):
+def vision_reasoner_mcp_reward(gt_prev_bbox, gt_curr_bbox, pred_curr_bbox, alpha=0.8, eps=1e-6):
     """
     Motion Consistency Precision (MCP) reward for next-frame prediction.
 
@@ -144,8 +188,8 @@ def vision_reasoner_mcp_reward(gt_prev_bbox, gt_curr_bbox, pred_curr_bbox, alpha
     # 3. Anti-static penalty
     # ------------------------
     # If model predicts almost no motion while GT moves, penalize strongly
-    if np_ < 0.1 * ng:
-        static_penalty = 0.2
+    if np_ < 0.2 * ng:
+        static_penalty = 0.1
     else:
         static_penalty = 1.0
 
@@ -214,61 +258,147 @@ def vision_reasoner_compute_score(predict_str: str, ground_truth: dict) -> float
     reward = format_reward + accuracy_reward + mcp_reward
     return reward
 
+# def batch_iou(boxes1, boxes2):
+#     # boxes1: (M,4), boxes2: (N,4)
+#     # 广播机制自动扩展维度
+#     x11, y11, x12, y12 = np.split(boxes1, 4, axis=1)  # (M,1)
+#     x21, y21, x22, y22 = np.split(boxes2, 4, axis=1)  # (N,1)
+    
+#     xA = np.maximum(x11, np.transpose(x21))  # (M,N)
+#     yA = np.maximum(y11, np.transpose(y21))
+#     xB = np.minimum(x12, np.transpose(x22))
+#     yB = np.minimum(y12, np.transpose(y22))
+    
+#     interArea = np.maximum(0, xB - xA + 1) * np.maximum(0, yB - yA + 1)
+#     box1Area = (x12 - x11 + 1) * (y12 - y11 + 1)  # (M,1)
+#     box2Area = (x22 - x21 + 1) * (y22 - y21 + 1)  # (N,1)
+    
+#     unionArea = box1Area + np.transpose(box2Area) - interArea
+#     iou = interArea / unionArea  # (M,N)
+#     return iou
+
+# def batch_l1_distance(boxes1, boxes2):
+#     # boxes1: (M,4), boxes2: (N,4)
+#     boxes1 = boxes1[:, np.newaxis, :]  # (M,1,4)
+#     boxes2 = boxes2[np.newaxis, :, :]  # (1,N,4)
+#     return np.mean(np.abs(boxes1 - boxes2), axis=2)  # (M,N)
+
+# def batch_points_distance(points1, points2):
+#     # points1: (M,2), points2: (N,2)
+#     points1 = points1[:, np.newaxis, :]  # (M,1,2)
+#     points2 = points2[np.newaxis, :, :]  # (1,N,2)
+    
+#     # 计算欧氏距离
+#     dist = np.sqrt(np.sum((points1 - points2)**2, axis=2))  # (M,N)
+#     return dist
+
+# def batch_points_in_box(points, boxes):
+#     """
+#     检查每个点是否在对应的框内
+#     points: (M,2) - M个点的坐标
+#     boxes: (M,4) - M个框的坐标 [x1,y1,x2,y2]
+#     返回: (M,) 布尔数组
+#     """
+#     x_check = (points[:,0] >= boxes[:,0]) & (points[:,0] <= boxes[:,2])
+#     y_check = (points[:,1] >= boxes[:,1]) & (points[:,1] <= boxes[:,3])
+#     return x_check & y_check
+
 def batch_iou(boxes1, boxes2):
-    # boxes1: (M,4), boxes2: (N,4)
-    # 广播机制自动扩展维度
-    x11, y11, x12, y12 = np.split(boxes1, 4, axis=1)  # (M,1)
-    x21, y21, x22, y22 = np.split(boxes2, 4, axis=1)  # (N,1)
-    
-    xA = np.maximum(x11, np.transpose(x21))  # (M,N)
-    yA = np.maximum(y11, np.transpose(y21))
-    xB = np.minimum(x12, np.transpose(x22))
-    yB = np.minimum(y12, np.transpose(y22))
-    
-    interArea = np.maximum(0, xB - xA + 1) * np.maximum(0, yB - yA + 1)
-    box1Area = (x12 - x11 + 1) * (y12 - y11 + 1)  # (M,1)
-    box2Area = (x22 - x21 + 1) * (y22 - y21 + 1)  # (N,1)
-    
+    # boxes1: (M,4), boxes2: (N,4) in xywh format
+    x1, y1, w1, h1 = np.split(boxes1, 4, axis=1)  # (M,1)
+    x2, y2, w2, h2 = np.split(boxes2, 4, axis=1)  # (N,1)
+
+    # Convert to x1y1x2y2
+    x1_min, y1_min = x1 - w1/2, y1 - h1/2
+    x1_max, y1_max = x1 + w1/2, y1 + h1/2
+    x2_min, y2_min = x2 - w2/2, y2 - h2/2
+    x2_max, y2_max = x2 + w2/2, y2 + h2/2
+
+    xA = np.maximum(x1_min, np.transpose(x2_min))  # (M,N)
+    yA = np.maximum(y1_min, np.transpose(y2_min))
+    xB = np.minimum(x1_max, np.transpose(x2_max))
+    yB = np.minimum(y1_max, np.transpose(y2_max))
+
+    interArea = np.maximum(0, xB - xA) * np.maximum(0, yB - yA)
+    box1Area = w1 * h1                        # (M,1)
+    box2Area = w2 * h2                        # (N,1)
+
     unionArea = box1Area + np.transpose(box2Area) - interArea
-    iou = interArea / unionArea  # (M,N)
+    iou = interArea / unionArea               # (M,N)
     return iou
 
+
 def batch_l1_distance(boxes1, boxes2):
-    # boxes1: (M,4), boxes2: (N,4)
+    # boxes1: (M,4), boxes2: (N,4) in xywh format — no change needed
     boxes1 = boxes1[:, np.newaxis, :]  # (M,1,4)
     boxes2 = boxes2[np.newaxis, :, :]  # (1,N,4)
     return np.mean(np.abs(boxes1 - boxes2), axis=2)  # (M,N)
 
+
 def batch_points_distance(points1, points2):
-    # points1: (M,2), points2: (N,2)
+    # points1: (M,2), points2: (N,2) — no change needed
     points1 = points1[:, np.newaxis, :]  # (M,1,2)
     points2 = points2[np.newaxis, :, :]  # (1,N,2)
-    
-    # 计算欧氏距离
-    dist = np.sqrt(np.sum((points1 - points2)**2, axis=2))  # (M,N)
-    return dist
+    return np.sqrt(np.sum((points1 - points2)**2, axis=2))  # (M,N)
+
 
 def batch_points_in_box(points, boxes):
     """
-    检查每个点是否在对应的框内
-    points: (M,2) - M个点的坐标
-    boxes: (M,4) - M个框的坐标 [x1,y1,x2,y2]
-    返回: (M,) 布尔数组
+    points: (M,2) - x, y coordinates
+    boxes:  (M,4) - xywh format [cx, cy, w, h]
+    returns: (M,) bool array
     """
-    x_check = (points[:,0] >= boxes[:,0]) & (points[:,0] <= boxes[:,2])
-    y_check = (points[:,1] >= boxes[:,1]) & (points[:,1] <= boxes[:,3])
+    cx, cy, w, h = boxes[:,0], boxes[:,1], boxes[:,2], boxes[:,3]
+
+    x_check = (points[:,0] >= cx - w/2) & (points[:,0] <= cx + w/2)
+    y_check = (points[:,1] >= cy - h/2) & (points[:,1] <= cy + h/2)
     return x_check & y_check
 
+
+    
 if __name__ == "__main__":
+    # ── Original example ──────────────────────────────────────────────────────
     predict_str = """
 <answer>
 [{"bbox": [10, 100, 398, 423]}]
 </answer>
 """
     ground_truth = {'curr': [{'bbox_2d': [1465.0, 420.0, 74.0, 176.0]}], 'prev': [{'bbox_2d': [1471.0, 419.0, 74.0, 176.0]}]}
-    print(predict_str)
-    print(ground_truth)
+    print("=" * 60)
+    print("ORIGINAL EXAMPLE")
     print("GT JSON:", json.dumps(ground_truth["curr"]))
     print("PRED STR:", predict_str)
-    print(vision_reasoner_compute_score(predict_str, ground_truth))
+    print("Score:", vision_reasoner_compute_score(predict_str, ground_truth))
+
+    # ── High reward: predicted bbox closely matches GT ────────────────────────
+    # GT: cx=1465, cy=420, w=74, h=176 → nearly identical prediction
+    predict_str_high = """
+<answer>
+[{"bbox": [1466.0, 421.0, 73.0, 175.0]}]
+</answer>
+"""
+    ground_truth_high = {'curr': [{'bbox_2d': [1465.0, 420.0, 74.0, 176.0]}], 'prev': [{'bbox_2d': [1471.0, 419.0, 74.0, 176.0]}]}
+    print("=" * 60)
+    print("HIGH REWARD EXAMPLE (prediction very close to GT in xywh)")
+    print("GT:   cx=1465, cy=420, w=74,  h=176")
+    print("PRED: cx=1466, cy=421, w=73,  h=175  ← off by ~1 pixel")
+    print("GT JSON:", json.dumps(ground_truth_high["curr"]))
+    print("PRED STR:", predict_str_high)
+    print("Score:", vision_reasoner_compute_score(predict_str_high, ground_truth_high))
+
+    # ── Low reward: predicted bbox far from GT ────────────────────────────────
+    # GT: cx=1465, cy=420, w=74, h=176 → prediction in totally different region
+    predict_str_low = """
+<answer>
+[{"bbox": [100.0, 80.0, 30.0, 40.0]}]
+</answer>
+"""
+    ground_truth_low = {'curr': [{'bbox_2d': [1465.0, 420.0, 74.0, 176.0]}], 'prev': [{'bbox_2d': [1471.0, 419.0, 74.0, 176.0]}]}
+    print("=" * 60)
+    print("LOW REWARD EXAMPLE (prediction far from GT in xywh)")
+    print("GT:   cx=1465, cy=420, w=74,  h=176")
+    print("PRED: cx=100,  cy=80,  w=30,  h=40   ← completely wrong region & size")
+    print("GT JSON:", json.dumps(ground_truth_low["curr"]))
+    print("PRED STR:", predict_str_low)
+    print("Score:", vision_reasoner_compute_score(predict_str_low, ground_truth_low))
     
