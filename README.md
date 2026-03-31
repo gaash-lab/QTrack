@@ -134,7 +134,7 @@ Before training, prepare you dataset using:
 python prepare_dataset/build_qtrack_dataset.py \
     --dataset_root <path_to_RMOT26> \
     --train_dir train \
-    --jsonl annotations.jsonl \
+    --json annotations.json \
     --output_dir hf_dataset_qtrack 
 ```
 
